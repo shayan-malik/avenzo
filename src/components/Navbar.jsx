@@ -19,14 +19,18 @@ export default function Navbar() {
     const linkClass = ({ isActive }) =>
         isActive
             ? "border-b-2 border-accent pb-1 font-semibold text-accent"
-            : "pb-1 text-gray-300 hover:text-white";
+            : "pb-1 text-white hover:text-accent";
 
     return (
         <header className="border-b border-border bg-bg">
-            <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-                <Link to="/" className="text-2xl font-extrabold text-accent">
-                    {/* <img src="/avenzo-logo.png" alt="Avenzo-Logo" /> */}
-                    Avenzo
+            <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+                <Link to="/" className="flex items-center gap-2">
+                    <img
+                        src="/avenzo-logo.png"
+                        alt="Avenzo logo"
+                        className="h-10 w-full object-contain"
+                    />
+                    {/* <span className="text-2xl font-extrabold text-accent">Avenzo</span> */}
                 </Link>
 
                 <div className="flex items-center gap-6 text-sm">
@@ -55,10 +59,10 @@ export default function Navbar() {
                     {!loading &&
                         (user ? (
                             <>
-                                <span className="text-muted">{user.first_name}</span>
+                                <span className="hidden text-muted md:inline">{user.first_name}</span>
                                 <button
                                     onClick={handleLogout}
-                                    className="rounded-lg border border-border px-3 py-1.5 hover:border-accent"
+                                    className="rounded-lg border border-accent px-4 py-1.5 font-semibold text-accent hover:bg-accent hover:text-black"
                                 >
                                     Logout
                                 </button>
@@ -70,7 +74,7 @@ export default function Navbar() {
                                 </NavLink>
                                 <Link
                                     to="/signup"
-                                    className="rounded-lg bg-accent px-3 py-1.5 font-semibold text-black hover:bg-accent-dark"
+                                    className="rounded-lg bg-accent px-4 py-1.5 font-semibold text-black hover:bg-accent-dark"
                                 >
                                     Signup
                                 </Link>
