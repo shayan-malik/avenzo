@@ -1,2 +1,9 @@
-// currency badalni ho to sirf yahan badlein (jaise "Rs ")
-export const formatPrice = (value) => `Rs${Number(value).toFixed(2)}`;
+export function formatPrice(value) {
+  const number = Number(value);
+
+  if (Number.isNaN(number)) return "Rs 0";
+
+  return "Rs " + number.toLocaleString("en-US", {
+    maximumFractionDigits: 2,
+  });
+}
