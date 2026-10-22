@@ -19,6 +19,7 @@ export default function AdminProducts() {
     const [form, setForm] = useState(emptyForm);
     const [categories, setCategories] = useState([]);
     const [saving, setSaving] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         const loadCategories = async () => {
@@ -35,6 +36,36 @@ export default function AdminProducts() {
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 4 * 1024 * 1024) {
+            toast.error("Image 4MB se chhoti honi chahiye");
+            e.target.value = "";
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        setUploading(true);
+
+        try {
+            const res = await api.post("/upload", formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+
+            setForm((prev) => ({ ...prev, image_url: res.data.url }));
+            toast.success("Image upload ho gayi");
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Image upload nahi ho saki");
+        } finally {
+            setUploading(false);
+            e.target.value = "";
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -141,7 +172,19 @@ export default function AdminProducts() {
                 ))}
             </select>
 
-            <label className="mb-1 block text-sm text-muted">Image URL</label>
+            <label className="mb-1 block text-sm text-muted">Product image</label>
+            <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploading}
+                className="mb-2 block w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-4 file:py-2 file:font-semibold file:text-black hover:file:bg-accent-dark disabled:opacity-60"
+            />
+            {uploading && <p className="mb-2 text-sm text-accent">Image upload ho rahi hai...</p>}
+
+            <label className="mb-1 block text-sm text-muted">
+                Ya image ka URL khud daalein
+            </label>
             <input
                 type="url"
                 name="image_url"
@@ -163,7 +206,7 @@ export default function AdminProducts() {
 
             <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || uploading}
                 className="w-full rounded-lg bg-accent py-3 font-semibold text-black hover:bg-accent-dark disabled:opacity-60"
             >
                 {saving ? "Wait..." : "Product add karein"}
