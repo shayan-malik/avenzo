@@ -16,10 +16,13 @@ export default function ProductCard({ product }) {
     }
 
     return (
-        <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition hover:border-accent">
-            <div className="relative flex h-56 items-center justify-center bg-surface-2">
+        <Link
+            to={`/products/${id}`}
+            className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition hover:border-accent"
+        >
+            <div className="relative flex h-56 items-center justify-center overflow-hidden bg-surface-2">
                 {category_name && (
-                    <span className="absolute left-3 top-3 rounded-full bg-accent px-3 py-1 text-xs font-bold text-black">
+                    <span className="absolute left-3 top-3 z-10 rounded-full bg-accent px-3 py-1 text-xs font-bold text-black">
                         {category_name}
                     </span>
                 )}
@@ -29,7 +32,7 @@ export default function ProductCard({ product }) {
                         src={image_url}
                         alt={name}
                         loading="lazy"
-                        className="h-full w-full object-contain p-4"
+                        className="h-full w-full object-contain p-4 transition-transform duration-300 group-hover:scale-105"
                     />
                 ) : (
                     <span className="text-sm text-muted">No image</span>
@@ -52,13 +55,10 @@ export default function ProductCard({ product }) {
                     </span>
                 </div>
 
-                <Link
-                    to={`/products/${id}`}
-                    className="mt-4 rounded-lg bg-accent py-2.5 text-center font-semibold text-black hover:bg-accent-dark"
-                >
+                <span className="mt-4 rounded-lg bg-accent py-2.5 text-center font-semibold text-black transition group-hover:bg-accent-dark">
                     View Product →
-                </Link>
+                </span>
             </div>
-        </div>
+        </Link>
     );
 }
