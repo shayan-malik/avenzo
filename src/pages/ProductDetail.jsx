@@ -32,7 +32,7 @@ export default function ProductDetail() {
                 if (status === 404 || status === 400) {
                     setNotFound(true);
                 } else {
-                    toast.error("Product load nahi ho saka");
+                    toast.error("Failed to load product");
                 }
             } finally {
                 setLoading(false);
@@ -44,7 +44,7 @@ export default function ProductDetail() {
 
     const addToCart = async (goToCart) => {
         if (!user) {
-            toast.error("Pehle login karein");
+            toast.error("Please log in first");
             return navigate("/login");
         }
 
@@ -52,13 +52,13 @@ export default function ProductDetail() {
 
         try {
             await api.post("/cart", { product_id: product.id, quantity });
-            toast.success("Cart mein add ho gaya");
+            toast.success("Added to cart");
 
             if (goToCart) {
                 navigate("/cart");
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || "Kuch masla ho gaya");
+            toast.error(error.response?.data?.message || "Something went wrong");
         } finally {
             setAdding(false);
         }
@@ -71,9 +71,9 @@ export default function ProductDetail() {
     if (notFound || !product) {
         return (
             <div className="p-8">
-                <p className="text-muted">Product nahi mila</p>
+                <p className="text-muted">Product not found</p>
                 <Link to="/" className="mt-4 inline-block text-accent hover:underline">
-                    ← Products pe wapas
+                    ← Back to products
                 </Link>
             </div>
         );

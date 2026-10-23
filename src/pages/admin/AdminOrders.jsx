@@ -24,7 +24,7 @@ export default function AdminOrders() {
             });
             setOrders(res.data);
         } catch {
-            toast.error("Orders load nahi ho sake");
+            toast.error("Failed to load orders");
         } finally {
             setLoading(false);
         }
@@ -40,7 +40,7 @@ export default function AdminOrders() {
 
         if (
             newStatus === "cancelled" &&
-            !window.confirm("Order cancel karna hai? Ye wapas nahi ho sakta.")
+            !window.confirm("Cancel this order? This cannot be undone.")
         ) {
             return;
         }
@@ -50,7 +50,7 @@ export default function AdminOrders() {
             toast.success(`Order #${order.id}: ${newStatus}`);
             setReloadKey((k) => k + 1);
         } catch (error) {
-            toast.error(error.response?.data?.message || "Status update nahi hua");
+            toast.error(error.response?.data?.message || "Failed to update status");
         }
     };
 
@@ -77,7 +77,7 @@ export default function AdminOrders() {
                 </select>
             </div>
 
-            {orders.length === 0 && <p className="text-muted">Koi order nahi mila</p>}
+            {orders.length === 0 && <p className="text-muted">No orders found</p>}
 
             <div className="space-y-6">
                 {orders.map((order) => (

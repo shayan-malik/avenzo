@@ -78,7 +78,7 @@ export default function AdminProducts() {
             setForm((prev) => ({ ...prev, image_url: res.data.url }));
             toast.success("Image upload ho gayi");
         } catch (error) {
-            toast.error(error.response?.data?.message || "Image upload nahi ho saki");
+            toast.error(error.response?.data?.message || "Image upload failed");
         } finally {
             setUploading(false);
             e.target.value = "";

@@ -21,7 +21,7 @@ export default function Cart() {
             setItems(res.data.items);
             setTotal(res.data.total);
         } catch {
-            toast.error("Cart load nahi ho saki");
+            toast.error("Failed to load cart");
         } finally {
             setLoading(false);
         }
@@ -35,17 +35,17 @@ export default function Cart() {
             await api.put(`/cart/${item.id}`, { quantity: newQty });
             setReloadKey((k) => k + 1);
         } catch (error) {
-            toast.error(error.response?.data?.message || "Quantity update nahi hui");
+            toast.error(error.response?.data?.message || "Failed to update quantity");
         }
     };
 
     const removeItem = async (itemId) => {
         try {
             await api.delete(`/cart/${itemId}`);
-            toast.success("Cart se hata diya");
+            toast.success("Removed from cart");
             setReloadKey((k) => k + 1);
         } catch (error) {
-            toast.error(error.response?.data?.message || "Item hata nahi saka");
+            toast.error(error.response?.data?.message || "Failed to remove item");
         }
     };
 
@@ -53,17 +53,17 @@ export default function Cart() {
         e.preventDefault();
 
         if (!address.trim()) {
-            return toast.error("Shipping address likhein");
+            return toast.error("Please enter a shipping address");
         }
 
         setPlacing(true);
 
         try {
             await api.post("/orders", { shipping_address: address });
-            toast.success("Order place ho gaya");
+            toast.success("Order placed successfully");
             navigate("/orders");
         } catch (error) {
-            toast.error(error.response?.data?.message || "Order place nahi ho saka");
+            toast.error(error.response?.data?.message || "Failed to place order");
             setReloadKey((k) => k + 1);
         } finally {
             setPlacing(false);
@@ -78,12 +78,12 @@ export default function Cart() {
         return (
             <div className="p-8">
                 <h1 className="text-3xl font-extrabold text-accent">Your Cart</h1>
-                <p className="mt-4 text-muted">Aapki cart khali hai</p>
+                <p className="mt-4 text-muted">Your cart is empty</p>
                 <Link
                     to="/"
                     className="mt-4 inline-block rounded-lg bg-accent px-4 py-2 font-semibold text-black hover:bg-accent-dark"
                 >
-                    Shopping shuru karein
+                    Start shopping
                 </Link>
             </div>
         );
@@ -134,7 +134,7 @@ export default function Cart() {
 
                                 {item.quantity > item.stock && (
                                     <p className="text-xs text-red-400">
-                                        Ab sirf {item.stock} items bache hain
+                                        Only {item.stock} left in stock
                                     </p>
                                 )}
 
@@ -182,7 +182,7 @@ export default function Cart() {
                         rows={3}
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        placeholder="Ghar ka number, gali, shehar..."
+                        placeholder="House number, street, city..."
                         className="mb-4 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 outline-none focus:border-accent"
                     />
 
@@ -191,11 +191,11 @@ export default function Cart() {
                         disabled={placing}
                         className="w-full rounded-lg bg-accent py-3 font-semibold text-black hover:bg-accent-dark disabled:opacity-60"
                     >
-                        {placing ? "Wait..." : "Place Order"}
+                        {placing ? "Please wait..." : "Place Order"}
                     </button>
 
                     <p className="mt-3 text-center text-xs text-muted">
-                        Payment abhi nahi: Cash on Delivery
+                        Payment method: Cash on Delivery
                     </p>
                 </form>
             </div>

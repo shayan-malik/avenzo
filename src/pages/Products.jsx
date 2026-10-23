@@ -67,7 +67,7 @@ export default function Products() {
                 }
             } catch {
                 if (!ignore) {
-                    toast.error("Products load nahi ho sake");
+                    toast.error("Failed to load products");
                 }
             } finally {
                 if (!ignore) {

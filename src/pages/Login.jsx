@@ -23,10 +23,10 @@ export default function Login() {
 
     try {
       await login(form.email, form.password);
-      toast.success("Login ho gaya");
+      toast.success("Logged in successfully");
       navigate("/");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Kuch masla ho gaya");
+      toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       setSubmitting(false);
     }
@@ -75,7 +75,7 @@ export default function Login() {
           disabled={submitting}
           className="w-full rounded-lg bg-accent py-3 font-semibold text-black hover:bg-accent-dark disabled:opacity-60"
         >
-          {submitting ? "Wait..." : "Login"}
+          {submitting ? "Please wait..." : "Login"}
         </button>
 
         <p className="mt-4 text-center text-sm text-muted">

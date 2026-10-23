@@ -16,7 +16,7 @@ export default function Orders() {
                 const res = await api.get("/orders");
                 setOrders(res.data);
             } catch {
-                toast.error("Orders load nahi ho sake");
+                toast.error("Failed to load orders");
             } finally {
                 setLoading(false);
             }
@@ -33,12 +33,12 @@ export default function Orders() {
         return (
             <div className="p-8">
                 <h1 className="text-3xl font-extrabold text-accent">My Orders</h1>
-                <p className="mt-4 text-muted">Aap ne abhi tak koi order nahi diya</p>
+                <p className="mt-4 text-muted">You haven't placed any orders yet</p>
                 <Link
                     to="/"
                     className="mt-4 inline-block rounded-lg bg-accent px-4 py-2 font-semibold text-black hover:bg-accent-dark"
                 >
-                    Shopping shuru karein
+                    Start shopping
                 </Link>
             </div>
         );

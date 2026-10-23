@@ -29,11 +29,11 @@ export default function Signup() {
     e.preventDefault();
 
     if (form.password.length < 6) {
-      return toast.error("Password kam az kam 6 characters ka ho");
+      return toast.error("Password must be at least 6 characters");
     }
 
     if (form.password !== form.confirm_password) {
-      return toast.error("Dono passwords match nahi karte");
+      return toast.error("Passwords do not match");
     }
 
     setSubmitting(true);
@@ -50,10 +50,10 @@ export default function Signup() {
       // signup ke baad seedha login
       await login(form.email, form.password);
 
-      toast.success("Account ban gaya");
+      toast.success("Account created successfully");
       navigate("/");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Kuch masla ho gaya");
+      toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       setSubmitting(false);
     }
@@ -151,7 +151,7 @@ export default function Signup() {
           disabled={submitting}
           className="w-full rounded-lg bg-accent py-3 font-semibold text-black hover:bg-accent-dark disabled:opacity-60"
         >
-          {submitting ? "Wait..." : "Sign up"}
+          {submitting ? "Please wait..." : "Sign up"}
         </button>
 
         <p className="mt-4 text-center text-sm text-muted">
