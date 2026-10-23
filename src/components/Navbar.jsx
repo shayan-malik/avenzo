@@ -16,10 +16,10 @@ export default function Navbar() {
     try {
       await logout();
       closeMenu();
-      toast.success("Logout ho gaya");
+      toast.success("Logged out successfully");
       navigate("/login");
     } catch {
-      toast.error("Logout nahi ho saka");
+      toast.error("Failed to log out");
     }
   };
 
