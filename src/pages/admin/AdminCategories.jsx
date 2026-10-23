@@ -5,6 +5,7 @@ import api from "../../api/axios";
 export default function AdminCategories() {
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
+  const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
 
@@ -21,6 +22,30 @@ export default function AdminCategories() {
     loadCategories();
   }, [reloadKey]);
 
+  const handleEdit = (category) => {
+    setEditingId(category.id);
+    setName(category.name);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setName("");
+  };
+
+  const handleDelete = async (category) => {
+    if (!window.confirm(`"${category.name}" delete karna chahte hain?`)) return;
+
+    try {
+      await api.delete(`/categories/${category.id}`);
+      toast.success("Category delete ho gayi");
+
+      if (editingId === category.id) handleCancelEdit();
+      setReloadKey((k) => k + 1);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Category delete nahi ho saki");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -31,12 +56,19 @@ export default function AdminCategories() {
     setSaving(true);
 
     try {
-      await api.post("/categories", { name });
-      toast.success("Category add ho gayi");
+      if (editingId) {
+        await api.put(`/categories/${editingId}`, { name });
+        toast.success("Category update ho gayi");
+      } else {
+        await api.post("/categories", { name });
+        toast.success("Category add ho gayi");
+      }
+
+      setEditingId(null);
       setName("");
       setReloadKey((k) => k + 1);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Category add nahi ho saki");
+      toast.error(error.response?.data?.message || "Category save nahi ho saki");
     } finally {
       setSaving(false);
     }
@@ -57,8 +89,17 @@ export default function AdminCategories() {
           disabled={saving}
           className="rounded-lg bg-accent px-5 py-2 font-semibold text-black hover:bg-accent-dark disabled:opacity-60"
         >
-          {saving ? "Wait..." : "Add"}
+          {saving ? "Wait..." : editingId ? "Update" : "Add"}
         </button>
+        {editingId && (
+          <button
+            type="button"
+            onClick={handleCancelEdit}
+            className="rounded-lg border border-border px-4 py-2 font-semibold hover:border-accent"
+          >
+            Cancel
+          </button>
+        )}
       </form>
 
       <h2 className="mb-3 text-lg font-bold">
@@ -68,14 +109,29 @@ export default function AdminCategories() {
       {categories.length === 0 ? (
         <p className="text-muted">Abhi koi category nahi</p>
       ) : (
-        <div className="flex flex-wrap gap-2">
+        <div className="space-y-2">
           {categories.map((category) => (
-            <span
+            <div
               key={category.id}
-              className="rounded-full border border-border bg-surface px-4 py-1.5 text-sm"
+              className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-2.5"
             >
-              {category.name}
-            </span>
+              <span className="truncate font-medium">{category.name}</span>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleEdit(category)}
+                  className="rounded-lg border border-border px-3 py-1.5 text-sm hover:border-accent"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(category)}
+                  className="rounded-lg border border-red-500/50 px-3 py-1.5 text-sm text-red-400 hover:bg-red-500/10"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       )}
