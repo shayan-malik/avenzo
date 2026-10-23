@@ -3,12 +3,23 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/auth.js";
+import { useQuery } from "@tanstack/react-query";
+import api from "../api/axios";
 import Logo from "./Logo.jsx";
 
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+
+  const { data: cartCount = 0 } = useQuery({
+    queryKey: ["cart", user?.id],
+    queryFn: async () => {
+      const res = await api.get("/cart");
+      return res.data.items.reduce((sum, item) => sum + item.quantity, 0);
+    },
+    enabled: !!user,
+  });
 
   const closeMenu = () => setOpen(false);
 
@@ -58,6 +69,11 @@ export default function Navbar() {
           {user && (
             <NavLink to="/cart" className={linkClass} onClick={closeMenu}>
               Cart
+              {cartCount > 0 && (
+                <span className="ml-1.5 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-black">
+                  {cartCount}
+                </span>
+              )}
             </NavLink>
           )}
 
@@ -76,7 +92,14 @@ export default function Navbar() {
           {!loading &&
             (user ? (
               <>
-                <span className="text-muted">{user.first_name}</span>
+                <NavLink
+                  to="/profile"
+                  className={linkClass}
+                  onClick={closeMenu}
+                >
+                  {user.first_name}
+                </NavLink>
+
                 <button
                   onClick={handleLogout}
                   className="self-start rounded-lg border border-accent px-4 py-1.5 font-semibold text-accent hover:bg-accent hover:text-black md:self-auto"

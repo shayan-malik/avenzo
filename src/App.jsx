@@ -12,55 +12,65 @@ import AdminLayout from "./pages/admin/AdminLayout.jsx";
 import AdminOrders from "./pages/admin/AdminOrders.jsx";
 import AdminCategories from "./pages/admin/AdminCategories.jsx";
 import AdminProducts from "./pages/admin/AdminProducts.jsx";
+import NotFound from "./pages/NotFound.jsx";
+import Profile from "./pages/Profile.jsx";
 
 export default function App() {
-    return (
-        <Routes>
-            {/* login/signup: bina navbar aur footer ke */}
-            <Route element={<AuthLayout />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-            </Route>
+  return (
+    <Routes>
+      {/* login/signup: bina navbar aur footer ke */}
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Route>
 
-            {/* baqi sab pages: navbar + footer ke saath */}
-            <Route element={<MainLayout />}>
-                <Route path="/" element={<Products />} />
-                <Route path="/products/:id" element={<ProductDetail />} />
+      {/* baqi sab pages: navbar + footer ke saath */}
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Products />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
 
-                <Route
-                    path="/cart"
-                    element={
-                        <ProtectedRoute>
-                            <Cart />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/orders"
-                    element={
-                        <ProtectedRoute>
-                            <Orders />
-                        </ProtectedRoute>
-                    }
-                />
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <Orders />
+            </ProtectedRoute>
+          }
+        />
 
-                <Route
-                    path="/admin"
-                    element={
-                        <ProtectedRoute adminOnly>
-                            <AdminLayout />
-                        </ProtectedRoute>
-                    }
-                >
-                    <Route index element={<Navigate to="orders" replace />} />
-                    <Route path="orders" element={<AdminOrders />} />
-                    <Route path="categories" element={<AdminCategories />} />
-                    <Route path="products" element={<AdminProducts />} />
-                </Route>
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
 
-                <Route path="*" element={<p className="p-8 text-muted">Page nahi mila</p>} />
-            </Route>
-        </Routes>
-    );
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="orders" replace />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="products" element={<AdminProducts />} />
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
+  );
 }
-

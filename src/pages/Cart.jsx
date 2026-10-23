@@ -9,6 +9,10 @@ export default function Cart() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
+    const refreshCartCount = () => {
+    queryClient.invalidateQueries({ queryKey: ["cart"] });
+};
+
 const refreshProductCache = () => {
     queryClient.invalidateQueries({ queryKey: ["products"] });
     queryClient.invalidateQueries({ queryKey: ["product"] });
@@ -40,6 +44,7 @@ const refreshProductCache = () => {
     const updateQuantity = async (item, newQty) => {
         try {
             await api.put(`/cart/${item.id}`, { quantity: newQty });
+            refreshCartCount();
             setReloadKey((k) => k + 1);
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to update quantity");
@@ -50,6 +55,7 @@ const refreshProductCache = () => {
         try {
             await api.delete(`/cart/${itemId}`);
             toast.success("Removed from cart");
+            refreshCartCount();
             setReloadKey((k) => k + 1);
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to remove item");
@@ -69,10 +75,13 @@ const refreshProductCache = () => {
             await api.post("/orders", { shipping_address: address });
             toast.success("Order placed successfully");
             refreshProductCache();
+            refreshCartCount();
             navigate("/orders");
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to place order");
             refreshProductCache();
+            refreshCartCount();
+            navigate("/orders");
             setReloadKey((k) => k + 1);
         } finally {
             setPlacing(false);

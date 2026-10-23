@@ -39,7 +39,7 @@ export default function Login() {
         className="w-full max-w-sm rounded-2xl border border-border bg-surface p-8"
       >
         <div className="mb-6 flex justify-center">
-          <Logo className="h-24" />
+          <Logo className="h-20" />
         </div>
 
         <div className="mb-4">

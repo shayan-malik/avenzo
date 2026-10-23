@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import { useAuth } from "../context/auth.js";
 import { formatPrice } from "../utils/formatPrice.js";
+import NotFound from "./NotFound.jsx";
 
 function ProductView({ product }) {
     const { user } = useAuth();
     const navigate = useNavigate();
+
+    const queryClient = useQueryClient();
 
     const [quantity, setQuantity] = useState(1);
     const [adding, setAdding] = useState(false);
@@ -24,6 +27,7 @@ function ProductView({ product }) {
         try {
             await api.post("/cart", { product_id: product.id, quantity });
             toast.success("Added to cart");
+            queryClient.invalidateQueries({ queryKey: ["cart"] });
 
             if (goToCart) {
                 navigate("/cart");
@@ -159,12 +163,14 @@ export default function ProductDetail() {
         return <p className="p-8 text-muted">Loading...</p>;
     }
 
+    if (notFound) {
+    return <NotFound />;
+    }
+
     if (isError || !product) {
         return (
             <div className="p-8">
-                <p className="text-muted">
-                    {notFound ? "Product not found" : "Could not load this product"}
-                </p>
+                <p className="text-muted">Could not load this product</p>
                 <Link to="/" className="mt-4 inline-block text-accent hover:underline">
                     ← Back to products
                 </Link>

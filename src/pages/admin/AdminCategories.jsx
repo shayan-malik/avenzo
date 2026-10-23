@@ -23,7 +23,7 @@ export default function AdminCategories() {
         const res = await api.get("/categories");
         setCategories(res.data);
       } catch {
-        toast.error("Categories load nahi ho sakin");
+        toast.error("Failed to load categories");
       }
     };
 
@@ -41,18 +41,19 @@ export default function AdminCategories() {
   };
 
   const handleDelete = async (category) => {
-    if (!window.confirm(`"${category.name}" delete karna chahte hain?`)) return;
+    if (!window.confirm(`Are you sure you want to delete "${category.name}"?`))
+      return;
 
     try {
       await api.delete(`/categories/${category.id}`);
-      toast.success("Category delete ho gayi");
+      toast.success("Category deleted successfully");
       refreshCache();
 
       if (editingId === category.id) handleCancelEdit();
       setReloadKey((k) => k + 1);
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Category delete nahi ho saki",
+        error.response?.data?.message || "Failed to delete category",
       );
     }
   };
@@ -61,7 +62,7 @@ export default function AdminCategories() {
     e.preventDefault();
 
     if (!name.trim()) {
-      return toast.error("Category ka naam likhein");
+      return toast.error("Please enter a category name");
     }
 
     setSaving(true);
@@ -69,19 +70,17 @@ export default function AdminCategories() {
     try {
       if (editingId) {
         await api.put(`/categories/${editingId}`, { name });
-        toast.success("Category update ho gayi");
+        toast.success("Category updated successfully");
       } else {
         await api.post("/categories", { name });
-        toast.success("Category add ho gayi");
+        toast.success("Category added successfully");
       }
-      refreshCache()
+      refreshCache();
       setEditingId(null);
       setName("");
       setReloadKey((k) => k + 1);
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Category save nahi ho saki",
-      );
+      toast.error(error.response?.data?.message || "Failed to save category");
     } finally {
       setSaving(false);
     }
@@ -92,7 +91,7 @@ export default function AdminCategories() {
       <form onSubmit={handleSubmit} className="mb-8 flex gap-3">
         <input
           type="text"
-          placeholder="Nayi category (jaise Beauty)"
+          placeholder="New category (e.g. Beauty)"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="flex-1 rounded-lg border border-border bg-surface-2 px-3 py-2 outline-none focus:border-accent"
@@ -102,7 +101,7 @@ export default function AdminCategories() {
           disabled={saving}
           className="rounded-lg bg-accent px-5 py-2 font-semibold text-black hover:bg-accent-dark disabled:opacity-60"
         >
-          {saving ? "Wait..." : editingId ? "Update" : "Add"}
+          {saving ? "Please wait..." : editingId ? "Update" : "Add"}
         </button>
         {editingId && (
           <button
@@ -120,7 +119,7 @@ export default function AdminCategories() {
       </h2>
 
       {categories.length === 0 ? (
-        <p className="text-muted">Abhi koi category nahi</p>
+        <p className="text-muted">No categories yet</p>
       ) : (
         <div className="space-y-2">
           {categories.map((category) => (

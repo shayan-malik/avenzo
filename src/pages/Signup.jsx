@@ -66,7 +66,7 @@ export default function Signup() {
         className="w-full max-w-md rounded-2xl border border-border bg-surface p-8"
       >
         <div className="mb-6 flex justify-center">
-          <Logo className="h-24" />
+          <Logo className="h-20" />
         </div>
 
         <div className="mb-4 grid grid-cols-2 gap-4">
