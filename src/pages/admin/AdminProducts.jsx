@@ -38,7 +38,7 @@ const refreshProductCache = () => {
                 const res = await api.get("/categories");
                 setCategories(res.data);
             } catch {
-                toast.error("Categories load nahi ho sakin");
+                toast.error("Categories could not be loaded");
             }
         };
 
@@ -51,7 +51,7 @@ const refreshProductCache = () => {
                 const res = await api.get("/products", { params: { limit: 50 } });
                 setProducts(res.data.products);
             } catch {
-                toast.error("Products load nahi ho sake");
+                toast.error("Products could not be loaded");
             }
         };
 
@@ -67,7 +67,7 @@ const refreshProductCache = () => {
         if (!file) return;
 
         if (file.size > 4 * 1024 * 1024) {
-            toast.error("Image 4MB se chhoti honi chahiye");
+            toast.error("Image must be smaller than 4MB.");
             e.target.value = "";
             return;
         }
@@ -83,7 +83,7 @@ const refreshProductCache = () => {
             });
 
             setForm((prev) => ({ ...prev, image_url: res.data.url }));
-            toast.success("Image upload ho gayi");
+            toast.success("Image uploaded");
         } catch (error) {
             toast.error(error.response?.data?.message || "Image upload failed");
         } finally {
@@ -111,7 +111,7 @@ const refreshProductCache = () => {
     };
 
     const handleDelete = async (product) => {
-        if (!window.confirm(`"${product.name}" delete karna chahte hain?`)) return;
+        if (!window.confirm(`"${product.name}" Do you want to delete it?`)) return;
 
         try {
             await api.delete(`/products/${product.id}`);
@@ -121,7 +121,7 @@ const refreshProductCache = () => {
             if (editingId === product.id) handleCancelEdit();
             setReloadKey((key) => key + 1);
         } catch (error) {
-            toast.error(error.response?.data?.message || "Product delete nahi ho saka");
+            toast.error(error.response?.data?.message || "Product could not be deleted");
         }
     };
 
@@ -160,9 +160,9 @@ const refreshProductCache = () => {
     if (categories.length === 0) {
         return (
             <p className="text-muted">
-                Product add karne se pehle{" "}
+                Before adding a product{" "}
                 <Link to="/admin/categories" className="text-accent hover:underline">
-                    category add karein
+                    add category
                 </Link>
                 .
             </p>
@@ -176,7 +176,7 @@ const refreshProductCache = () => {
                 className="max-w-2xl rounded-2xl border border-border bg-surface p-6"
             >
                 <h2 className="mb-6 text-xl font-bold">
-                    {editingId ? "Product edit karein" : "Naya product"}
+                    {editingId ? "Edit product" : "New product"}
                 </h2>
 
                 <label className="mb-1 block text-sm text-muted">Name</label>
@@ -250,11 +250,11 @@ const refreshProductCache = () => {
                     className="mb-2 block w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-4 file:py-2 file:font-semibold file:text-black hover:file:bg-accent-dark disabled:opacity-60"
                 />
                 {uploading && (
-                    <p className="mb-2 text-sm text-accent">Image upload ho rahi hai...</p>
+                    <p className="mb-2 text-sm text-accent">Image is uploading...</p>
                 )}
 
                 <label className="mb-1 block text-sm text-muted">
-                    Ya image ka URL khud daalein
+                    Or enter the image URL yourself.
                 </label>
                 <input
                     type="url"
@@ -282,7 +282,7 @@ const refreshProductCache = () => {
                         className="flex-1 rounded-lg bg-accent py-3 font-semibold text-black hover:bg-accent-dark disabled:opacity-60"
                     >
                         {saving
-                            ? "Wait..."
+                            ? "Please Wait..."
                             : editingId
                             ? "Update karein"
                             : "Product add karein"}
@@ -301,11 +301,11 @@ const refreshProductCache = () => {
             </form>
 
             <h2 className="mb-4 mt-10 text-xl font-bold">
-                Saare products ({products.length})
+                All products ({products.length})
             </h2>
 
             {products.length === 0 ? (
-                <p className="text-muted">Abhi koi product nahi hai.</p>
+                <p className="text-muted">There are no products yet.</p>
             ) : (
                 <div className="space-y-3">
                     {products.map((product) => (
