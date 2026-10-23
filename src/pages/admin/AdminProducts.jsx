@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { formatPrice } from "../../utils/formatPrice";
+import { useQueryClient } from "@tanstack/react-query";
 
 const emptyForm = {
     name: "",
@@ -24,6 +25,12 @@ export default function AdminProducts() {
     const [reloadKey, setReloadKey] = useState(0);
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const queryClient = useQueryClient();
+
+const refreshProductCache = () => {
+    queryClient.invalidateQueries({ queryKey: ["products"] });
+    queryClient.invalidateQueries({ queryKey: ["product"] });
+};
 
     useEffect(() => {
         const loadCategories = async () => {
@@ -108,7 +115,8 @@ export default function AdminProducts() {
 
         try {
             await api.delete(`/products/${product.id}`);
-            toast.success("Product delete ho gaya");
+            toast.success("Product deleted successfully");
+            refreshProductCache();
 
             if (editingId === product.id) handleCancelEdit();
             setReloadKey((key) => key + 1);
@@ -133,17 +141,17 @@ export default function AdminProducts() {
         try {
             if (editingId) {
                 await api.put(`/products/${editingId}`, body);
-                toast.success("Product update ho gaya");
+                toast.success("Product updated successfully");
             } else {
                 await api.post("/products", body);
-                toast.success("Product add ho gaya");
+                toast.success("Product added successfully");
             }
-
+            refreshProductCache();
             setEditingId(null);
             setForm(emptyForm);
             setReloadKey((key) => key + 1);
         } catch (error) {
-            toast.error(error.response?.data?.message || "Product save nahi ho saka");
+            toast.error(error.response?.data?.message || "Product cannot be saved");
         } finally {
             setSaving(false);
         }

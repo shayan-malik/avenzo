@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import ProductCard from "../components/ProductCard.jsx";
@@ -14,30 +15,42 @@ const fieldClass =
     "rounded-lg border border-border bg-surface-2 px-3 py-2 outline-none focus:border-accent";
 
 export default function Products() {
-    const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [totalPages, setTotalPages] = useState(1);
-
     const [searchInput, setSearchInput] = useState("");
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("");
     const [sort, setSort] = useState("newest");
     const [page, setPage] = useState(1);
 
-    // categories sirf ek dafa
-    useEffect(() => {
-        const loadCategories = async () => {
-            try {
-                const res = await api.get("/categories");
-                setCategories(res.data);
-            } catch (error) {
-                console.log(error);
-            }
-        };
+    // categories: 5 minute cache
+    const { data: categories = [] } = useQuery({
+        queryKey: ["categories"],
+        queryFn: async () => {
+            const res = await api.get("/categories");
+            return res.data;
+        },
+        staleTime: 5 * 60 * 1000
+    });
 
-        loadCategories();
-    }, []);
+    // products: filters ya page badle to naya key banta hai, purane keys cache mein rehte hain
+    const { data, isPending, isError, isPlaceholderData } = useQuery({
+        queryKey: ["products", { search, category, sort, page }],
+        queryFn: async () => {
+            const res = await api.get("/products", {
+                params: { search, category, sort, page, limit: 8 }
+            });
+            return res.data;
+        },
+        placeholderData: keepPreviousData
+    });
+
+    const products = data?.products ?? [];
+    const totalPages = data?.totalPages ?? 1;
+
+    useEffect(() => {
+        if (isError) {
+            toast.error("Failed to load products");
+        }
+    }, [isError]);
 
     // search: typing rukne ke 500ms baad hi search chalao
     useEffect(() => {
@@ -48,40 +61,6 @@ export default function Products() {
 
         return () => clearTimeout(timer);
     }, [searchInput]);
-
-    // products: filters ya page badle to dobara lao
-    useEffect(() => {
-        let ignore = false;
-
-        const loadProducts = async () => {
-            setLoading(true);
-
-            try {
-                const res = await api.get("/products", {
-                    params: { search, category, sort, page, limit: 8 }
-                });
-
-                if (!ignore) {
-                    setProducts(res.data.products);
-                    setTotalPages(res.data.totalPages);
-                }
-            } catch {
-                if (!ignore) {
-                    toast.error("Failed to load products");
-                }
-            } finally {
-                if (!ignore) {
-                    setLoading(false);
-                }
-            }
-        };
-
-        loadProducts();
-
-        return () => {
-            ignore = true;
-        };
-    }, [search, category, sort, page]);
 
     const changePage = (newPage) => {
         setPage(newPage);
@@ -133,16 +112,16 @@ export default function Products() {
                 </select>
             </div>
 
-            {loading && products.length === 0 && <p className="text-muted">Loading...</p>}
+            {isPending && <p className="text-muted">Loading...</p>}
 
-            {!loading && products.length === 0 && (
-                <p className="text-muted">Koi product nahi mila</p>
+            {!isPending && !isError && products.length === 0 && (
+                <p className="text-muted">No products found</p>
             )}
 
             {products.length > 0 && (
                 <div
                     className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${
-                        loading ? "opacity-50" : ""
+                        isPlaceholderData ? "opacity-50" : ""
                     }`}
                 >
                     {products.map((product) => (

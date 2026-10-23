@@ -4,6 +4,7 @@ import api from "../../api/axios";
 import StatusBadge from "../../components/StatusBadge.jsx";
 import { formatPrice } from "../../utils/formatPrice.js";
 import { formatDate } from "../../utils/formatDate.js";
+import { useQueryClient } from "@tanstack/react-query";
 
 const statuses = ["pending", "processing", "shipped", "delivered", "cancelled"];
 
@@ -15,6 +16,7 @@ export default function AdminOrders() {
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState("");
     const [reloadKey, setReloadKey] = useState(0);
+    const queryClient = useQueryClient();
 
     useEffect(() => {
     const loadOrders = async () => {
@@ -48,6 +50,12 @@ export default function AdminOrders() {
         try {
             await api.put(`/orders/${order.id}/status`, { status: newStatus });
             toast.success(`Order #${order.id}: ${newStatus}`);
+
+            if (newStatus === "cancelled") {
+                queryClient.invalidateQueries({ queryKey: ["products"] });
+                queryClient.invalidateQueries({ queryKey: ["product"] });
+            }
+
             setReloadKey((k) => k + 1);
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to update status");

@@ -1,46 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import { useAuth } from "../context/auth.js";
 import { formatPrice } from "../utils/formatPrice.js";
 
-
-export default function ProductDetail() {
-    const { id } = useParams();
+function ProductView({ product }) {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const [product, setProduct] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [notFound, setNotFound] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const [adding, setAdding] = useState(false);
-
-    useEffect(() => {
-        const loadProduct = async () => {
-            setLoading(true);
-            setNotFound(false);
-
-            try {
-                const res = await api.get(`/products/${id}`);
-                setProduct(res.data);
-                setQuantity(1);
-            } catch (error) {
-                const status = error.response?.status;
-
-                if (status === 404 || status === 400) {
-                    setNotFound(true);
-                } else {
-                    toast.error("Failed to load product");
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadProduct();
-    }, [id]);
 
     const addToCart = async (goToCart) => {
         if (!user) {
@@ -63,21 +34,6 @@ export default function ProductDetail() {
             setAdding(false);
         }
     };
-
-    if (loading) {
-        return <p className="p-8 text-muted">Loading...</p>;
-    }
-
-    if (notFound || !product) {
-        return (
-            <div className="p-8">
-                <p className="text-muted">Product not found</p>
-                <Link to="/" className="mt-4 inline-block text-accent hover:underline">
-                    ← Back to products
-                </Link>
-            </div>
-        );
-    }
 
     const outOfStock = product.stock === 0;
 
@@ -172,4 +128,49 @@ export default function ProductDetail() {
             </div>
         </div>
     );
+}
+
+export default function ProductDetail() {
+    const { id } = useParams();
+
+    const { data: product, isPending, isError, error } = useQuery({
+        queryKey: ["product", id],
+        queryFn: async () => {
+            const res = await api.get(`/products/${id}`);
+            return res.data;
+        },
+        retry: (failureCount, err) => {
+            const status = err.response?.status;
+            if (status === 404 || status === 400) return false;
+            return failureCount < 1;
+        }
+    });
+
+    const status = error?.response?.status;
+    const notFound = isError && (status === 404 || status === 400);
+
+    useEffect(() => {
+        if (isError && !notFound) {
+            toast.error("Failed to load product");
+        }
+    }, [isError, notFound]);
+
+    if (isPending) {
+        return <p className="p-8 text-muted">Loading...</p>;
+    }
+
+    if (isError || !product) {
+        return (
+            <div className="p-8">
+                <p className="text-muted">
+                    {notFound ? "Product not found" : "Could not load this product"}
+                </p>
+                <Link to="/" className="mt-4 inline-block text-accent hover:underline">
+                    ← Back to products
+                </Link>
+            </div>
+        );
+    }
+
+    return <ProductView key={product.id} product={product} />;
 }

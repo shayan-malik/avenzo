@@ -3,9 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import { formatPrice } from "../utils/formatPrice.js";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Cart() {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
+const refreshProductCache = () => {
+    queryClient.invalidateQueries({ queryKey: ["products"] });
+    queryClient.invalidateQueries({ queryKey: ["product"] });
+};
 
     const [items, setItems] = useState([]);
     const [total, setTotal] = useState(0);
@@ -61,9 +68,11 @@ export default function Cart() {
         try {
             await api.post("/orders", { shipping_address: address });
             toast.success("Order placed successfully");
+            refreshProductCache();
             navigate("/orders");
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to place order");
+            refreshProductCache();
             setReloadKey((k) => k + 1);
         } finally {
             setPlacing(false);

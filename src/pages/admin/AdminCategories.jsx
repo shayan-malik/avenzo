@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState([]);
@@ -8,6 +9,13 @@ export default function AdminCategories() {
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
+  const queryClient = useQueryClient();
+
+  const refreshCache = () => {
+    queryClient.invalidateQueries({ queryKey: ["categories"] });
+    queryClient.invalidateQueries({ queryKey: ["products"] });
+    queryClient.invalidateQueries({ queryKey: ["product"] });
+  };
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -38,11 +46,14 @@ export default function AdminCategories() {
     try {
       await api.delete(`/categories/${category.id}`);
       toast.success("Category delete ho gayi");
+      refreshCache();
 
       if (editingId === category.id) handleCancelEdit();
       setReloadKey((k) => k + 1);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Category delete nahi ho saki");
+      toast.error(
+        error.response?.data?.message || "Category delete nahi ho saki",
+      );
     }
   };
 
@@ -63,12 +74,14 @@ export default function AdminCategories() {
         await api.post("/categories", { name });
         toast.success("Category add ho gayi");
       }
-
+      refreshCache()
       setEditingId(null);
       setName("");
       setReloadKey((k) => k + 1);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Category save nahi ho saki");
+      toast.error(
+        error.response?.data?.message || "Category save nahi ho saki",
+      );
     } finally {
       setSaving(false);
     }
