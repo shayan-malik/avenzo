@@ -20,6 +20,8 @@ Use these accounts to explore the app without signing up:
 
 > The admin account has full access (add, edit and delete products, categories and orders). Please be gentle with the data.
 
+> Google sign-in is currently in Google's testing mode, so only approved test accounts can use it. Everyone else can use the demo accounts above or create an account with email and password.
+
 ## Screenshots
 
 | Products | Product Detail |
@@ -38,6 +40,7 @@ Use these accounts to explore the app without signing up:
 
 **Customers**
 - Sign up, log in and log out with JWT stored in an httpOnly cookie (passwords hashed with bcrypt)
+- "Continue with Google" sign-in (Google ID token verified on the backend, existing accounts are linked by email)
 - Browse products with debounced search, category filter, sorting and pagination
 - Product detail page with quantity selector, Add to Cart and Buy Now
 - Cart with quantity updates, item removal, live item count in the navbar and a shipping address at checkout
@@ -65,7 +68,7 @@ Use these accounts to explore the app without signing up:
 | Layer | Technology |
 | --- | --- |
 | Frontend | React, Vite, Tailwind CSS v4, React Router, TanStack Query, Axios, react-hot-toast, lucide-react |
-| Backend | Node.js, Express (ES modules), JWT, bcrypt, multer, helmet, express-rate-limit |
+| Backend | Node.js, Express (ES modules), JWT, bcrypt, Google OAuth (google-auth-library), multer, helmet, express-rate-limit |
 | Database | PostgreSQL on Neon (plain `pg`, no ORM) |
 | Media | Cloudinary |
 | Deployment | Vercel (frontend and backend) |
@@ -74,7 +77,7 @@ Use these accounts to explore the app without signing up:
 
 | Route group | Access | Description |
 | --- | --- | --- |
-| `/api/auth` | Public | Sign up, log in, log out |
+| `/api/auth` | Public | Sign up, log in, Google sign-in, log out |
 | `/api/profile` | Logged in | Get, update and deactivate own profile |
 | `/api/categories` | GET public, others admin | List, add, rename, delete |
 | `/api/products` | GET public, others admin | List (search, filter, sort, pagination), detail, add, edit, delete |
@@ -87,8 +90,8 @@ Use these accounts to explore the app without signing up:
 ### 1. Backend
 
 ```bash
-git clone https://github.com/shayan-malik/avenzo-ecommerce
-cd avenzo-ecommerce
+git clone <backend-repo-url>
+cd <backend-folder>
 npm install
 ```
 
@@ -105,6 +108,7 @@ JWT_SECRET=a-long-random-string
 CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=your-api-key
 CLOUDINARY_API_SECRET=your-api-secret
+GOOGLE_CLIENT_ID=your-google-oauth-client-id
 ```
 
 ```bash
@@ -116,9 +120,18 @@ The API runs on `http://localhost:5000`.
 ### 2. Frontend
 
 ```bash
-git clone https://github.com/shayan-malik/avenzo
+git clone <frontend-repo-url>
 cd ecommerce-client
 npm install
+```
+
+Create a `.env` file in the frontend root:
+
+```env
+VITE_GOOGLE_CLIENT_ID=your-google-oauth-client-id
+```
+
+```bash
 npm run dev
 ```
 
@@ -135,5 +148,5 @@ The Vite dev server proxies `/api` to `http://localhost:5000`.
 
 **Shayan Malik**
 
-- GitHub: https://github.com/shayan-malik
-- LinkedIn: https://www.linkedin.com/in/shayan-malik-43a93139b/
+- GitHub: https://github.com/your-username
+- LinkedIn: https://linkedin.com/in/your-profile
