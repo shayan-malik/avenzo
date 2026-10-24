@@ -170,7 +170,7 @@ export default function Navbar() {
                 <NavLink to="/cart" className={mobileLinkClass} onClick={closeMenu}>
                   <span>Cart</span>
                   {cartCount > 0 && (
-                    <span className="rounded-full bg-accent px-2.5 py-0.5 text-sm font-bold text-black">
+                    <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-black">
                       {cartCount}
                     </span>
                   )}
