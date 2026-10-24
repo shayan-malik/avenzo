@@ -197,7 +197,7 @@ export default function Navbar() {
             </div>
 
             {!loading && (
-              <div className="space-y-3 pt-8">
+              <div className="mt-auto space-y-3 pt-8">
                 {user ? (
                   <button
                     onClick={handleLogout}
