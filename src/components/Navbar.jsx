@@ -210,14 +210,14 @@ export default function Navbar() {
                     <Link
                       to="/login"
                       onClick={closeMenu}
-                      className="block w-full rounded-xl border border-border py-3.5 text-center text-lg font-semibold text-white hover:border-accent hover:text-accent"
+                      className="block w-full rounded-xl border border-border py-3 text-center text-md font-semibold text-white hover:border-accent hover:text-accent"
                     >
                       Login
                     </Link>
                     <Link
                       to="/signup"
                       onClick={closeMenu}
-                      className="block w-full rounded-xl bg-accent py-3.5 text-center text-lg font-semibold text-black hover:bg-accent-dark"
+                      className="block w-full rounded-xl bg-accent py-3 text-center text-md font-semibold text-black hover:bg-accent-dark"
                     >
                       Signup
                     </Link>
