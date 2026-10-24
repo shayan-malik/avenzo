@@ -59,11 +59,11 @@ export default function Navbar() {
       : "pb-1 text-white hover:text-accent";
 
   const mobileLinkClass = ({ isActive }) =>
-    `flex items-center justify-between rounded-xl px-4 py-4 text-xl ${
-      isActive
-        ? "bg-surface font-semibold text-accent"
-        : "text-white hover:bg-surface"
-    }`;
+  `flex items-center justify-between rounded-xl px-4 py-3 text-base ${
+    isActive
+      ? "bg-surface font-semibold text-accent"
+      : "text-white hover:bg-surface"
+  }`;
 
   const cartBadge = cartCount > 0 && (
     <span className="ml-1.5 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-black">
@@ -201,7 +201,7 @@ export default function Navbar() {
                 {user ? (
                   <button
                     onClick={handleLogout}
-                    className="w-full rounded-xl border border-accent py-3.5 text-lg font-semibold text-accent hover:bg-accent hover:text-black"
+                    className="w-full rounded-xl border border-accent py-3 text-base font-semibold text-accent hover:bg-accent hover:text-black"
                   >
                     Logout
                   </button>
@@ -210,14 +210,14 @@ export default function Navbar() {
                     <Link
                       to="/login"
                       onClick={closeMenu}
-                      className="block w-full rounded-xl border border-border py-3 text-center text-md font-semibold text-white hover:border-accent hover:text-accent"
+                      className="block w-full rounded-xl border border-border py-3 text-center text-base font-semibold text-white hover:border-accent hover:text-accent"
                     >
                       Login
                     </Link>
                     <Link
                       to="/signup"
                       onClick={closeMenu}
-                      className="block w-full rounded-xl bg-accent py-3 text-center text-md font-semibold text-black hover:bg-accent-dark"
+                      className="block w-full rounded-xl bg-accent py-3 text-center text-base font-semibold text-black hover:bg-accent-dark"
                     >
                       Signup
                     </Link>
