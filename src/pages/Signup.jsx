@@ -6,6 +6,7 @@ import api from "../api/axios";
 import { useAuth } from "../context/auth.js";
 import Logo from "../components/Logo.jsx";
 import FormInput from "../components/FormInput.jsx";
+import GoogleButton from "../components/GoogleButton.jsx";
 
 export default function Signup() {
   const { login } = useAuth();
@@ -153,6 +154,14 @@ export default function Signup() {
         >
           {submitting ? "Please wait..." : "Sign up"}
         </button>
+
+        <div className="my-5 flex items-center gap-3 text-xs text-muted">
+          <span className="h-px flex-1 bg-border" />
+          OR
+          <span className="h-px flex-1 bg-border" />
+        </div>
+
+        <GoogleButton />
 
         <p className="mt-4 text-center text-sm text-muted">
           Already have an account?{" "}

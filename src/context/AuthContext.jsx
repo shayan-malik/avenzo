@@ -32,12 +32,17 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const loginWithGoogle = async (credential) => {
+    const res = await api.post("/auth/google", { credential });
+    setUser(res.data.user);
+  };
+
   const updateUser = (changes) => {
     setUser((prev) => ({ ...prev, ...changes }));
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, updateUser, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );
