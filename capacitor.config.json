@@ -1,0 +1,9 @@
+{
+  "appId": "com.avenzo.app",
+  "appName": "Avenzo",
+  "webDir": "dist",
+  "server": {
+    "url": "https://avenzo-plum.vercel.app/",
+    "cleartext": true
+  }
+}

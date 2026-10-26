@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Avenzo</string>
+    <string name="title_activity_main">Avenzo</string>
+    <string name="package_name">com.avenzo.app</string>
+    <string name="custom_url_scheme">com.avenzo.app</string>
+</resources>

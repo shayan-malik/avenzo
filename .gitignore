@@ -9,6 +9,9 @@ lerna-debug.log*
 
 node_modules
 dist
+build
+android/app/build/
+.gradle/
 dist-ssr
 *.local
 
@@ -24,3 +27,8 @@ dist-ssr
 *.sw?
 
 .env
+
+# Android Studio local files
+android/.gradle/
+android/local.properties
+android/.idea/
