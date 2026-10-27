@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import api from "../api/axios";
 import { useAuth } from "../context/auth.js";
 import Logo from "./Logo.jsx";
+import GetAppButton from "../GetAppButton.jsx";
 
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
@@ -59,11 +60,11 @@ export default function Navbar() {
       : "pb-1 text-white hover:text-accent";
 
   const mobileLinkClass = ({ isActive }) =>
-  `flex items-center justify-between rounded-xl px-4 py-3 text-base ${
-    isActive
-      ? "bg-surface font-semibold text-accent"
-      : "text-white hover:bg-surface"
-  }`;
+    `flex items-center justify-between rounded-xl px-4 py-3 text-base ${
+      isActive
+        ? "bg-surface font-semibold text-accent"
+        : "text-white hover:bg-surface"
+    }`;
 
   const cartBadge = cartCount > 0 && (
     <span className="ml-1.5 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-black">
@@ -80,6 +81,7 @@ export default function Navbar() {
 
         {/* Desktop links */}
         <div className="hidden items-center gap-6 text-sm md:flex">
+          <GetAppButton />
           <NavLink to="/" end className={linkClass}>
             Products
           </NavLink>
@@ -162,12 +164,25 @@ export default function Navbar() {
 
           <div className="flex flex-1 flex-col overflow-y-auto px-4 pb-8 pt-4">
             <div className="space-y-1">
-              <NavLink to="/" end className={mobileLinkClass} onClick={closeMenu}>
+              <div className="pt-3 pb-6">
+                <GetAppButton />
+              </div>
+
+              <NavLink
+                to="/"
+                end
+                className={mobileLinkClass}
+                onClick={closeMenu}
+              >
                 Products
               </NavLink>
 
               {user && (
-                <NavLink to="/cart" className={mobileLinkClass} onClick={closeMenu}>
+                <NavLink
+                  to="/cart"
+                  className={mobileLinkClass}
+                  onClick={closeMenu}
+                >
                   <span>Cart</span>
                   {cartCount > 0 && (
                     <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-black">
@@ -178,19 +193,31 @@ export default function Navbar() {
               )}
 
               {user && (
-                <NavLink to="/orders" className={mobileLinkClass} onClick={closeMenu}>
+                <NavLink
+                  to="/orders"
+                  className={mobileLinkClass}
+                  onClick={closeMenu}
+                >
                   Orders
                 </NavLink>
               )}
 
               {user?.role === "admin" && (
-                <NavLink to="/admin" className={mobileLinkClass} onClick={closeMenu}>
+                <NavLink
+                  to="/admin"
+                  className={mobileLinkClass}
+                  onClick={closeMenu}
+                >
                   Admin
                 </NavLink>
               )}
 
               {user && (
-                <NavLink to="/profile" className={mobileLinkClass} onClick={closeMenu}>
+                <NavLink
+                  to="/profile"
+                  className={mobileLinkClass}
+                  onClick={closeMenu}
+                >
                   Profile ({user.first_name})
                 </NavLink>
               )}

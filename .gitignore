@@ -29,6 +29,17 @@ dist-ssr
 .env
 
 # Android Studio local files
-android/.gradle/
-android/local.properties
 android/.idea/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Android signing files
+*.jks
+*.keystore
