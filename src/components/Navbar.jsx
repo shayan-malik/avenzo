@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingCart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import { useAuth } from "../context/auth.js";
 import Logo from "./Logo.jsx";
-import GetAppButton from "../GetAppButton.jsx";
 
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
@@ -24,7 +23,6 @@ export default function Navbar() {
 
   const closeMenu = () => setOpen(false);
 
-  // menu khula ho to peeche ka page scroll na ho
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
 
@@ -33,7 +31,6 @@ export default function Navbar() {
     };
   }, [open]);
 
-  // screen bari ho jaye to mobile menu khud band ho jaye
   useEffect(() => {
     const onResize = () => {
       if (window.innerWidth >= 768) setOpen(false);
@@ -55,94 +52,110 @@ export default function Navbar() {
   };
 
   const linkClass = ({ isActive }) =>
-    isActive
-      ? "border-b-2 border-accent pb-1 font-semibold text-accent"
-      : "pb-1 text-white hover:text-accent";
+    `rounded-full px-4 py-1.5 text-sm transition ${
+      isActive
+        ? "bg-accent/15 font-semibold text-accent"
+        : "text-white/80 hover:bg-white/10 hover:text-white"
+    }`;
 
   const mobileLinkClass = ({ isActive }) =>
     `flex items-center justify-between rounded-xl px-4 py-3 text-base ${
       isActive
-        ? "bg-surface font-semibold text-accent"
-        : "text-white hover:bg-surface"
+        ? "bg-accent/15 font-semibold text-accent"
+        : "text-white hover:bg-white/5"
     }`;
 
-  const cartBadge = cartCount > 0 && (
-    <span className="ml-1.5 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-black">
-      {cartCount}
-    </span>
-  );
+  const initial = user?.first_name?.[0]?.toUpperCase() || "U";
 
   return (
-    <header className="border-b border-border bg-bg">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link to="/">
-          <Logo className="h-10 sm:h-14" />
-        </Link>
+    <header className="sticky top-0 z-40">
+      <div className="glass-nav">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+          <Link to="/">
+            <Logo className="h-10 sm:h-12" />
+          </Link>
 
-        {/* Desktop links */}
-        <div className="hidden items-center gap-6 text-sm md:flex">
-          <GetAppButton />
-          <NavLink to="/" end className={linkClass}>
-            Products
-          </NavLink>
-
-          {user && (
-            <NavLink to="/cart" className={linkClass}>
-              Cart
-              {cartBadge}
+          {/* Desktop */}
+          <div className="hidden items-center gap-1 md:flex">
+            <NavLink to="/" end className={linkClass}>
+              Products
             </NavLink>
-          )}
 
-          {user && (
-            <NavLink to="/orders" className={linkClass}>
-              Orders
-            </NavLink>
-          )}
+            {user && (
+              <NavLink to="/orders" className={linkClass}>
+                Orders
+              </NavLink>
+            )}
 
-          {user?.role === "admin" && (
-            <NavLink to="/admin" className={linkClass}>
-              Admin
-            </NavLink>
-          )}
+            {user?.role === "admin" && (
+              <NavLink to="/admin" className={linkClass}>
+                Admin
+              </NavLink>
+            )}
+          </div>
 
-          {!loading &&
-            (user ? (
-              <>
-                <NavLink to="/profile" className={linkClass}>
-                  {user.first_name}
-                </NavLink>
-                <button
-                  onClick={handleLogout}
-                  className="rounded-lg border border-accent px-4 py-1.5 font-semibold text-accent hover:bg-accent hover:text-black"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <NavLink to="/login" className={linkClass}>
-                  Login
-                </NavLink>
-                <Link
-                  to="/signup"
-                  className="rounded-lg bg-accent px-4 py-1.5 font-semibold text-black hover:bg-accent-dark"
-                >
-                  Signup
-                </Link>
-              </>
-            ))}
-        </div>
+          <div className="hidden items-center gap-3 md:flex">
+            {user && (
+              <NavLink
+                to="/cart"
+                aria-label="Cart"
+                className="glass relative flex h-10 w-10 items-center justify-center rounded-full text-white transition hover:border-accent/60 hover:text-accent"
+              >
+                <ShoppingCart size={18} />
+                {cartCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-xs font-bold text-black">
+                    {cartCount}
+                  </span>
+                )}
+              </NavLink>
+            )}
 
-        {/* Mobile hamburger */}
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="Open menu"
-          className="rounded-lg border border-border p-2 text-white hover:border-accent hover:text-accent md:hidden"
-        >
-          <Menu size={22} />
-        </button>
-      </nav>
+            {!loading &&
+              (user ? (
+                <>
+                  <NavLink
+                    to="/profile"
+                    className="glass flex items-center gap-2 rounded-full py-1 pl-1 pr-4 text-sm text-white transition hover:border-accent/60"
+                  >
+                    <span className="btn-gold flex h-8 w-8 items-center justify-center rounded-full text-sm">
+                      {initial}
+                    </span>
+                    {user.first_name}
+                  </NavLink>
+
+                  <button
+                    onClick={handleLogout}
+                    className="rounded-full border border-white/15 px-4 py-1.5 text-sm font-semibold text-white/80 transition hover:border-accent hover:text-accent"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <NavLink to="/login" className={linkClass}>
+                    Login
+                  </NavLink>
+                  <Link
+                    to="/signup"
+                    className="btn-gold rounded-full px-5 py-2 text-sm"
+                  >
+                    Signup
+                  </Link>
+                </>
+              ))}
+          </div>
+
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-label="Open menu"
+            className="glass rounded-xl p-2 text-white hover:text-accent md:hidden"
+          >
+            <Menu size={22} />
+          </button>
+        </nav>
+      </div>
 
       {/* Mobile full-screen menu */}
       {open && (
@@ -156,7 +169,7 @@ export default function Navbar() {
               type="button"
               onClick={closeMenu}
               aria-label="Close menu"
-              className="rounded-lg border border-border p-2 text-white hover:border-accent hover:text-accent"
+              className="glass rounded-xl p-2 text-white hover:text-accent"
             >
               <X size={22} />
             </button>
@@ -164,25 +177,12 @@ export default function Navbar() {
 
           <div className="flex flex-1 flex-col overflow-y-auto px-4 pb-8 pt-4">
             <div className="space-y-1">
-              <div className="pt-3 pb-6">
-                <GetAppButton />
-              </div>
-
-              <NavLink
-                to="/"
-                end
-                className={mobileLinkClass}
-                onClick={closeMenu}
-              >
+              <NavLink to="/" end className={mobileLinkClass} onClick={closeMenu}>
                 Products
               </NavLink>
 
               {user && (
-                <NavLink
-                  to="/cart"
-                  className={mobileLinkClass}
-                  onClick={closeMenu}
-                >
+                <NavLink to="/cart" className={mobileLinkClass} onClick={closeMenu}>
                   <span>Cart</span>
                   {cartCount > 0 && (
                     <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-black">
@@ -193,31 +193,19 @@ export default function Navbar() {
               )}
 
               {user && (
-                <NavLink
-                  to="/orders"
-                  className={mobileLinkClass}
-                  onClick={closeMenu}
-                >
+                <NavLink to="/orders" className={mobileLinkClass} onClick={closeMenu}>
                   Orders
                 </NavLink>
               )}
 
               {user?.role === "admin" && (
-                <NavLink
-                  to="/admin"
-                  className={mobileLinkClass}
-                  onClick={closeMenu}
-                >
+                <NavLink to="/admin" className={mobileLinkClass} onClick={closeMenu}>
                   Admin
                 </NavLink>
               )}
 
               {user && (
-                <NavLink
-                  to="/profile"
-                  className={mobileLinkClass}
-                  onClick={closeMenu}
-                >
+                <NavLink to="/profile" className={mobileLinkClass} onClick={closeMenu}>
                   Profile ({user.first_name})
                 </NavLink>
               )}
@@ -237,14 +225,14 @@ export default function Navbar() {
                     <Link
                       to="/login"
                       onClick={closeMenu}
-                      className="block w-full rounded-xl border border-border py-3 text-center text-base font-semibold text-white hover:border-accent hover:text-accent"
+                      className="glass block w-full rounded-xl py-3 text-center text-base font-semibold text-white hover:text-accent"
                     >
                       Login
                     </Link>
                     <Link
                       to="/signup"
                       onClick={closeMenu}
-                      className="block w-full rounded-xl bg-accent py-3 text-center text-base font-semibold text-black hover:bg-accent-dark"
+                      className="btn-gold block w-full rounded-xl py-3 text-center text-base"
                     >
                       Signup
                     </Link>

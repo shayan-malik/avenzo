@@ -140,7 +140,7 @@ const refreshProductCache = () => {
                                     </Link>
                                     <button
                                         onClick={() => removeItem(item.id)}
-                                        className="text-sm text-muted hover:text-red-400"
+                                        className="text-sm text-muted hover:text-red-400 cursor-pointer"
                                     >
                                         Remove
                                     </button>
@@ -161,7 +161,7 @@ const refreshProductCache = () => {
                                         <button
                                             onClick={() => updateQuantity(item, item.quantity - 1)}
                                             disabled={item.quantity <= 1}
-                                            className="px-3 py-1 hover:text-accent disabled:opacity-40"
+                                            className="px-3 py-1 hover:text-accent disabled:opacity-40 cursor-pointer"
                                         >
                                             −
                                         </button>
@@ -169,7 +169,7 @@ const refreshProductCache = () => {
                                         <button
                                             onClick={() => updateQuantity(item, item.quantity + 1)}
                                             disabled={item.quantity >= item.stock}
-                                            className="px-3 py-1 hover:text-accent disabled:opacity-40"
+                                            className="px-3 py-1 hover:text-accent disabled:opacity-40 cursor-pointer"
                                         >
                                             +
                                         </button>
@@ -207,7 +207,7 @@ const refreshProductCache = () => {
                     <button
                         type="submit"
                         disabled={placing}
-                        className="w-full rounded-lg bg-accent py-3 font-semibold text-black hover:bg-accent-dark disabled:opacity-60"
+                        className="w-full rounded-lg bg-accent py-3 font-semibold text-black hover:bg-accent-dark disabled:opacity-60 cursor-pointer"
                     >
                         {placing ? "Please wait..." : "Place Order"}
                     </button>

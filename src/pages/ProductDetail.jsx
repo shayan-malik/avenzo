@@ -96,7 +96,7 @@ function ProductView({ product }) {
                             <button
                                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                                 disabled={outOfStock}
-                                className="px-4 py-2 hover:text-accent disabled:opacity-40"
+                                className="px-4 py-2 hover:text-accent disabled:opacity-40 cursor-pointer"
                             >
                                 −
                             </button>
@@ -104,7 +104,7 @@ function ProductView({ product }) {
                             <button
                                 onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
                                 disabled={outOfStock}
-                                className="px-4 py-2 hover:text-accent disabled:opacity-40"
+                                className="px-4 py-2 hover:text-accent disabled:opacity-40 cursor-pointer"
                             >
                                 +
                             </button>
@@ -115,7 +115,7 @@ function ProductView({ product }) {
                         <button
                             onClick={() => addToCart(false)}
                             disabled={outOfStock || adding}
-                            className="flex-1 rounded-lg bg-accent py-3 font-semibold text-black hover:bg-accent-dark disabled:opacity-50"
+                            className="flex-1 rounded-lg bg-accent py-3 font-semibold text-black hover:bg-accent-dark disabled:opacity-50 cursor-pointer"
                         >
                             {outOfStock ? "Out of stock" : "Add To Cart"}
                         </button>
@@ -123,7 +123,7 @@ function ProductView({ product }) {
                         <button
                             onClick={() => addToCart(true)}
                             disabled={outOfStock || adding}
-                            className="flex-1 rounded-lg border border-border py-3 font-semibold hover:border-accent disabled:opacity-50"
+                            className="flex-1 rounded-lg border border-border py-3 font-semibold hover:border-accent disabled:opacity-50 cursor-pointer"
                         >
                             Buy Now
                         </button>

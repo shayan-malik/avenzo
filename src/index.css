@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&display=swap");
 
 @theme {
     --color-bg: #0a0a0a;
@@ -13,4 +14,113 @@
 body {
     background-color: var(--color-bg);
     color: #ffffff;
+}
+
+/* ===== Avenzo UI v2 ===== */
+
+h1,
+h2,
+h3 {
+  font-family: "Sora", system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+body {
+  background:
+    radial-gradient(60rem 40rem at 85% -10%, rgba(255, 184, 0, 0.12), transparent 60%),
+    radial-gradient(50rem 35rem at -10% 25%, rgba(255, 184, 0, 0.06), transparent 60%),
+    #0a0a0a;
+  background-attachment: fixed;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-nav {
+  background: rgba(10, 10, 10, 0.65);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #ffe08a 0%, #ffb800 45%, #ff8a00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #ffcc33, #ffb800 50%, #e69a00);
+  color: #000;
+  font-weight: 600;
+  box-shadow: 0 8px 24px -10px rgba(255, 184, 0, 0.6);
+  transition: transform 0.2s, filter 0.2s, box-shadow 0.2s;
+}
+
+.btn-gold:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px -10px rgba(255, 184, 0, 0.75);
+}
+
+.card-glow {
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.card-glow:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 184, 0, 0.5);
+  box-shadow: 0 18px 40px -18px rgba(255, 184, 0, 0.35);
+}
+
+.skeleton {
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0.04) 30%,
+    rgba(255, 255, 255, 0.09) 50%,
+    rgba(255, 255, 255, 0.04) 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .skeleton {
+    animation: none;
+  }
+
+  .card-glow:hover,
+  .btn-gold:hover:not(:disabled) {
+    transform: none;
+  }
 }
