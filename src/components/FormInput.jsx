@@ -8,23 +8,23 @@ export default function FormInput({ icon: Icon, type = "text", ...props }) {
     return (
         <div className="relative">
             {Icon && (
-                <Icon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
+                <Icon className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
             )}
 
             <input
                 type={isPassword && show ? "text" : type}
                 {...props}
-                className={`w-full rounded-lg border border-border bg-surface-2 py-3 outline-none focus:border-accent ${
-                    Icon ? "pl-10" : "pl-3"
-                } ${isPassword ? "pr-10" : "pr-3"}`}
+                className={`w-full rounded-xl border border-white/10 bg-white/5 py-3 outline-none transition placeholder:text-muted focus:border-accent/60 focus:bg-white/[0.07] ${
+                    Icon ? "pl-11" : "pl-4"
+                } ${isPassword ? "pr-11" : "pr-4"}`}
             />
 
             {isPassword && (
                 <button
                     type="button"
                     onClick={() => setShow(!show)}
-                    aria-label="Password dikhayein ya chhupayein"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white"
+                    aria-label={show ? "Hide password" : "Show password"}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted transition hover:text-white"
                 >
                     {show ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>

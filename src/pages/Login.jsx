@@ -34,69 +34,69 @@ export default function Login() {
   };
 
   return (
-    <div className="flex w-full justify-center px-4 py-8">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-2xl border border-border bg-surface p-8"
+    <form
+      onSubmit={handleSubmit}
+      className="glass animate-fade-up mx-auto w-full max-w-md rounded-3xl p-8"
+    >
+      <div className="mb-6 flex justify-center">
+        <Logo className="h-20" />
+      </div>
+
+      <h1 className="text-center text-2xl font-extrabold">Welcome back</h1>
+      <p className="mb-6 mt-1 text-center text-sm text-muted">
+        Log in to continue shopping
+      </p>
+
+      <div className="mb-4">
+        <FormInput
+          icon={Mail}
+          type="email"
+          name="email"
+          placeholder="Email address"
+          aria-label="Email address"
+          autoComplete="email"
+          value={form.email}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="mb-6">
+        <FormInput
+          icon={Lock}
+          type="password"
+          name="password"
+          placeholder="Password"
+          aria-label="Password"
+          autoComplete="current-password"
+          value={form.password}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={submitting}
+        className="btn-gold w-full rounded-full py-3 disabled:opacity-60"
       >
-        <div className="mb-6 flex justify-center">
-          <Logo className="h-20" />
-        </div>
+        {submitting ? "Please wait..." : "Login"}
+      </button>
 
-        <div className="mb-4">
-          <FormInput
-            icon={Mail}
-            type="email"
-            name="email"
-            placeholder="Email address"
-            aria-label="Email address"
-            autoComplete="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <div className="my-5 flex items-center gap-3 text-xs text-muted">
+        <span className="h-px flex-1 bg-white/10" />
+        OR
+        <span className="h-px flex-1 bg-white/10" />
+      </div>
 
-        <div className="mb-6">
-          <FormInput
-            icon={Lock}
-            type="password"
-            name="password"
-            placeholder="Password"
-            aria-label="Password"
-            autoComplete="current-password"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <GoogleButton />
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded-lg bg-accent py-3 font-semibold text-black hover:bg-accent-dark disabled:opacity-60"
-        >
-          {submitting ? "Please wait..." : "Login"}
-        </button>
-
-        <div className="my-5 flex items-center gap-3 text-xs text-muted">
-          <span className="h-px flex-1 bg-border" />
-          OR
-          <span className="h-px flex-1 bg-border" />
-        </div>
-
-        <GoogleButton />
-
-        <p className="mt-4 text-center text-sm text-muted">
-          Don't have an account?{" "}
-          <Link
-            to="/signup"
-            className="font-semibold text-accent hover:underline"
-          >
-            Sign up
-          </Link>
-        </p>
-      </form>
-    </div>
+      <p className="mt-6 text-center text-sm text-muted">
+        Don't have an account?{" "}
+        <Link to="/signup" className="font-semibold text-accent hover:underline">
+          Sign up
+        </Link>
+      </p>
+    </form>
   );
 }

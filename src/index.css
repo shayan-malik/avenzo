@@ -11,6 +11,10 @@
     --color-muted: #bdbdbd;
 }
 
+html {
+  color-scheme: dark;
+}
+
 body {
     background-color: var(--color-bg);
     color: #ffffff;
@@ -123,4 +127,23 @@ body {
   .btn-gold:hover:not(:disabled) {
     transform: none;
   }
+}
+
+/* Chrome autofill ko dark theme mein rakhna */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #1a1a1d inset !important;
+  box-shadow: 0 0 0 1000px #1a1a1d inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+input:-webkit-autofill:focus {
+  border-color: rgba(255, 184, 0, 0.6);
 }

@@ -1,22 +1,32 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { Minus, Plus, Trash2, ShoppingBag, Banknote, ShieldCheck } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import { formatPrice } from "../utils/formatPrice.js";
-import { useQueryClient } from "@tanstack/react-query";
+
+function CartSkeleton() {
+    return (
+        <div className="mx-auto max-w-6xl px-4 py-8">
+            <div className="skeleton mb-6 h-10 w-48 rounded" />
+
+            <div className="grid gap-8 lg:grid-cols-3">
+                <div className="space-y-4 lg:col-span-2">
+                    {[0, 1, 2].map((i) => (
+                        <div key={i} className="skeleton h-32 rounded-2xl" />
+                    ))}
+                </div>
+
+                <div className="skeleton h-80 rounded-2xl" />
+            </div>
+        </div>
+    );
+}
 
 export default function Cart() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-
-    const refreshCartCount = () => {
-    queryClient.invalidateQueries({ queryKey: ["cart"] });
-};
-
-const refreshProductCache = () => {
-    queryClient.invalidateQueries({ queryKey: ["products"] });
-    queryClient.invalidateQueries({ queryKey: ["product"] });
-};
 
     const [items, setItems] = useState([]);
     const [total, setTotal] = useState(0);
@@ -25,21 +35,30 @@ const refreshProductCache = () => {
     const [placing, setPlacing] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
 
-    useEffect(() => {
-    const loadCart = async () => {
-        try {
-            const res = await api.get("/cart");
-            setItems(res.data.items);
-            setTotal(res.data.total);
-        } catch {
-            toast.error("Failed to load cart");
-        } finally {
-            setLoading(false);
-        }
+    const refreshProductCache = () => {
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+        queryClient.invalidateQueries({ queryKey: ["product"] });
     };
 
-    loadCart();
-}, [reloadKey]);
+    const refreshCartCount = () => {
+        queryClient.invalidateQueries({ queryKey: ["cart"] });
+    };
+
+    useEffect(() => {
+        const loadCart = async () => {
+            try {
+                const res = await api.get("/cart");
+                setItems(res.data.items);
+                setTotal(res.data.total);
+            } catch {
+                toast.error("Failed to load cart");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadCart();
+    }, [reloadKey]);
 
     const updateQuantity = async (item, newQty) => {
         try {
@@ -80,8 +99,6 @@ const refreshProductCache = () => {
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to place order");
             refreshProductCache();
-            refreshCartCount();
-            navigate("/orders");
             setReloadKey((k) => k + 1);
         } finally {
             setPlacing(false);
@@ -89,36 +106,64 @@ const refreshProductCache = () => {
     };
 
     if (loading) {
-        return <p className="p-8 text-muted">Loading...</p>;
+        return <CartSkeleton />;
     }
 
     if (items.length === 0) {
         return (
-            <div className="p-8">
-                <h1 className="text-3xl font-extrabold text-accent">Your Cart</h1>
-                <p className="mt-4 text-muted">Your cart is empty</p>
-                <Link
-                    to="/"
-                    className="mt-4 inline-block rounded-lg bg-accent px-4 py-2 font-semibold text-black hover:bg-accent-dark"
-                >
-                    Start shopping
-                </Link>
+            <div className="mx-auto max-w-6xl px-4 py-8">
+                <h1 className="mb-6 text-3xl font-extrabold">
+                    <span className="text-gradient">Your Cart</span>
+                </h1>
+
+                <div className="glass animate-fade-up mx-auto max-w-lg rounded-3xl px-6 py-16 text-center">
+                    <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/15 text-accent">
+                        <ShoppingBag size={28} />
+                    </span>
+
+                    <p className="mt-5 text-xl font-bold">Your cart is empty</p>
+                    <p className="mt-1 text-sm text-muted">
+                        Looks like you have not added anything yet.
+                    </p>
+
+                    <Link
+                        to="/"
+                        className="btn-gold mt-6 inline-block rounded-full px-8 py-3"
+                    >
+                        Start shopping
+                    </Link>
+                </div>
             </div>
         );
     }
 
+    const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
     return (
         <div className="mx-auto max-w-6xl px-4 py-8">
-            <h1 className="mb-6 text-3xl font-extrabold text-accent">Your Cart</h1>
+            <h1 className="mb-6 text-3xl font-extrabold">
+                <span className="text-gradient">Your Cart</span>
+                <span className="ml-3 text-base font-normal text-muted">
+                    {itemCount} {itemCount === 1 ? "item" : "items"}
+                </span>
+            </h1>
 
             <div className="grid gap-8 lg:grid-cols-3">
                 <div className="space-y-4 lg:col-span-2">
-                    {items.map((item) => (
+                    {items.map((item, index) => (
                         <div
                             key={item.id}
-                            className="flex gap-4 rounded-2xl border border-border bg-surface p-4"
+                            style={{ animationDelay: `${Math.min(index, 6) * 60}ms` }}
+                            className="glass animate-fade-up flex gap-4 rounded-2xl p-4"
                         >
-                            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-lg bg-surface-2">
+                            <Link
+                                to={`/products/${item.product_id}`}
+                                className="flex h-28 w-28 shrink-0 items-center justify-center rounded-xl"
+                                style={{
+                                    background:
+                                        "radial-gradient(circle at 50% 40%, rgba(255,184,0,0.14), rgba(255,255,255,0.03) 70%)"
+                                }}
+                            >
                                 {item.image_url ? (
                                     <img
                                         src={item.image_url}
@@ -128,27 +173,31 @@ const refreshProductCache = () => {
                                 ) : (
                                     <span className="text-xs text-muted">No image</span>
                                 )}
-                            </div>
+                            </Link>
 
-                            <div className="flex flex-1 flex-col justify-between gap-2">
-                                <div className="flex justify-between gap-2">
-                                    <Link
-                                        to={`/products/${item.product_id}`}
-                                        className="font-bold hover:text-accent"
-                                    >
-                                        {item.name}
-                                    </Link>
+                            <div className="flex min-w-0 flex-1 flex-col justify-between gap-2">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <Link
+                                            to={`/products/${item.product_id}`}
+                                            className="block truncate text-lg font-bold transition hover:text-accent"
+                                        >
+                                            {item.name}
+                                        </Link>
+                                        <p className="text-sm text-muted">
+                                            {formatPrice(item.price)} each
+                                        </p>
+                                    </div>
+
                                     <button
                                         onClick={() => removeItem(item.id)}
-                                        className="text-sm text-muted hover:text-red-400 cursor-pointer"
+                                        aria-label={`Remove ${item.name}`}
+                                        className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-muted transition hover:bg-red-500/10 hover:text-red-400"
                                     >
-                                        Remove
+                                        <Trash2 size={15} />
+                                        <span className="hidden sm:inline">Remove</span>
                                     </button>
                                 </div>
-
-                                <p className="text-sm text-muted">
-                                    {formatPrice(item.price)} each
-                                </p>
 
                                 {item.quantity > item.stock && (
                                     <p className="text-xs text-red-400">
@@ -157,25 +206,29 @@ const refreshProductCache = () => {
                                 )}
 
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center rounded-lg border border-border">
+                                    <div className="glass inline-flex items-center rounded-full">
                                         <button
                                             onClick={() => updateQuantity(item, item.quantity - 1)}
                                             disabled={item.quantity <= 1}
-                                            className="px-3 py-1 hover:text-accent disabled:opacity-40 cursor-pointer"
+                                            aria-label="Decrease quantity"
+                                            className="flex h-9 w-9 items-center justify-center rounded-full hover:text-accent disabled:opacity-40"
                                         >
-                                            −
+                                            <Minus size={15} />
                                         </button>
-                                        <span className="min-w-8 text-center">{item.quantity}</span>
+                                        <span className="min-w-8 text-center font-semibold">
+                                            {item.quantity}
+                                        </span>
                                         <button
                                             onClick={() => updateQuantity(item, item.quantity + 1)}
                                             disabled={item.quantity >= item.stock}
-                                            className="px-3 py-1 hover:text-accent disabled:opacity-40 cursor-pointer"
+                                            aria-label="Increase quantity"
+                                            className="flex h-9 w-9 items-center justify-center rounded-full hover:text-accent disabled:opacity-40"
                                         >
-                                            +
+                                            <Plus size={15} />
                                         </button>
                                     </div>
 
-                                    <p className="font-bold text-accent">
+                                    <p className="text-gradient text-lg font-extrabold">
                                         {formatPrice(item.line_total)}
                                     </p>
                                 </div>
@@ -186,35 +239,51 @@ const refreshProductCache = () => {
 
                 <form
                     onSubmit={placeOrder}
-                    className="h-fit rounded-2xl border border-border bg-surface p-6"
+                    className="glass animate-fade-up h-fit rounded-2xl p-6 lg:sticky lg:top-24"
                 >
-                    <h2 className="mb-4 text-xl font-bold">Order Summary</h2>
+                    <h2 className="mb-5 text-xl font-bold">Order Summary</h2>
+
+                    <div className="flex items-center justify-between text-sm text-muted">
+                        <span>Items</span>
+                        <span>{itemCount}</span>
+                    </div>
+
+                    <div className="my-4 h-px bg-white/10" />
 
                     <div className="mb-6 flex items-center justify-between">
                         <span className="text-muted">Total</span>
-                        <span className="text-2xl font-bold text-accent">{formatPrice(total)}</span>
+                        <span className="text-gradient text-3xl font-extrabold">
+                            {formatPrice(total)}
+                        </span>
                     </div>
 
-                    <label className="mb-1 block text-sm text-muted">Shipping address</label>
+                    <label className="mb-2 block text-sm text-muted">Shipping address</label>
                     <textarea
                         rows={3}
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
                         placeholder="House number, street, city..."
-                        className="mb-4 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 outline-none focus:border-accent"
+                        className="mb-5 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 outline-none placeholder:text-muted focus:border-accent/60"
                     />
 
                     <button
                         type="submit"
                         disabled={placing}
-                        className="w-full rounded-lg bg-accent py-3 font-semibold text-black hover:bg-accent-dark disabled:opacity-60 cursor-pointer"
+                        className="btn-gold w-full rounded-full py-3.5 disabled:opacity-60"
                     >
                         {placing ? "Please wait..." : "Place Order"}
                     </button>
 
-                    <p className="mt-3 text-center text-xs text-muted">
-                        Payment method: Cash on Delivery
-                    </p>
+                    <div className="mt-5 space-y-2 text-xs text-white/70">
+                        <p className="flex items-center gap-2">
+                            <Banknote size={14} className="text-accent" />
+                            Payment method: Cash on Delivery
+                        </p>
+                        <p className="flex items-center gap-2">
+                            <ShieldCheck size={14} className="text-accent" />
+                            Secure checkout
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>

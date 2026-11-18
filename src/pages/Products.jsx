@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import api from "../api/axios";
 import ProductCard from "../components/ProductCard.jsx";
 import ProductCardSkeleton from "../components/ProductCardSkeleton.jsx";
+import { useSearchParams } from "react-router-dom";
 
 const sortOptions = [
   { value: "newest", label: "Newest" },
@@ -22,9 +23,17 @@ const trustChips = [
 export default function Products() {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const category = searchParams.get("category") || "";
   const [sort, setSort] = useState("newest");
   const [page, setPage] = useState(1);
+
+  const [prevCategory, setPrevCategory] = useState(category);
+
+if (category !== prevCategory) {
+    setPrevCategory(category);
+    setPage(1);
+}
 
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
@@ -71,9 +80,9 @@ export default function Products() {
   };
 
   const selectCategory = (id) => {
-    setCategory(id);
+    setSearchParams(id ? { category: id } : {});
     setPage(1);
-  };
+};
 
   const scrollToCatalog = () => {
     document.getElementById("catalog")?.scrollIntoView({ behavior: "smooth" });

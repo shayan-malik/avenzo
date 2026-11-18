@@ -48,7 +48,6 @@ export default function Signup() {
         password: form.password,
       });
 
-      // signup ke baad seedha login
       await login(form.email, form.password);
 
       toast.success("Account created successfully");
@@ -61,118 +60,118 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex w-full justify-center px-4 py-8">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-2xl border border-border bg-surface p-8"
+    <form
+      onSubmit={handleSubmit}
+      className="glass animate-fade-up mx-auto w-full max-w-md rounded-3xl p-8"
+    >
+      <div className="mb-6 flex justify-center">
+        <Logo className="h-20" />
+      </div>
+
+      <h1 className="text-center text-2xl font-extrabold">Create your account</h1>
+      <p className="mb-6 mt-1 text-center text-sm text-muted">
+        Join Avenzo and start shopping
+      </p>
+
+      <div className="mb-4 grid grid-cols-2 gap-4">
+        <FormInput
+          icon={User}
+          name="first_name"
+          placeholder="First name"
+          aria-label="First name"
+          autoComplete="given-name"
+          value={form.first_name}
+          onChange={handleChange}
+          required
+        />
+        <FormInput
+          icon={User}
+          name="last_name"
+          placeholder="Last name"
+          aria-label="Last name"
+          autoComplete="family-name"
+          value={form.last_name}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="mb-4">
+        <FormInput
+          icon={Mail}
+          type="email"
+          name="email"
+          placeholder="Email address"
+          aria-label="Email address"
+          autoComplete="email"
+          value={form.email}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="mb-4">
+        <FormInput
+          icon={Phone}
+          name="phone"
+          placeholder="Phone (optional)"
+          aria-label="Phone"
+          autoComplete="tel"
+          value={form.phone}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="mb-4">
+        <FormInput
+          icon={Lock}
+          type="password"
+          name="password"
+          placeholder="Password"
+          aria-label="Password"
+          autoComplete="new-password"
+          value={form.password}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="mb-6">
+        <FormInput
+          icon={Lock}
+          type="password"
+          name="confirm_password"
+          placeholder="Confirm password"
+          aria-label="Confirm password"
+          autoComplete="new-password"
+          value={form.confirm_password}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={submitting}
+        className="btn-gold w-full rounded-full py-3 disabled:opacity-60"
       >
-        <div className="mb-6 flex justify-center">
-          <Logo className="h-20" />
-        </div>
+        {submitting ? "Please wait..." : "Sign up"}
+      </button>
 
-        <div className="mb-4 grid grid-cols-2 gap-4">
-          <FormInput
-            icon={User}
-            name="first_name"
-            placeholder="First name"
-            aria-label="First name"
-            autoComplete="given-name"
-            value={form.first_name}
-            onChange={handleChange}
-            required
-          />
-          <FormInput
-            icon={User}
-            name="last_name"
-            placeholder="Last name"
-            aria-label="Last name"
-            autoComplete="family-name"
-            value={form.last_name}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <div className="my-5 flex items-center gap-3 text-xs text-muted">
+        <span className="h-px flex-1 bg-white/10" />
+        OR
+        <span className="h-px flex-1 bg-white/10" />
+      </div>
 
-        <div className="mb-4">
-          <FormInput
-            icon={Mail}
-            type="email"
-            name="email"
-            placeholder="Email address"
-            aria-label="Email address"
-            autoComplete="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <GoogleButton />
 
-        <div className="mb-4">
-          <FormInput
-            icon={Phone}
-            name="phone"
-            placeholder="Phone (optional)"
-            aria-label="Phone"
-            autoComplete="tel"
-            value={form.phone}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-4">
-          <FormInput
-            icon={Lock}
-            type="password"
-            name="password"
-            placeholder="Password"
-            aria-label="Password"
-            autoComplete="new-password"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="mb-6">
-          <FormInput
-            icon={Lock}
-            type="password"
-            name="confirm_password"
-            placeholder="Confirm password"
-            aria-label="Confirm password"
-            autoComplete="new-password"
-            value={form.confirm_password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded-lg bg-accent py-3 font-semibold text-black hover:bg-accent-dark disabled:opacity-60"
-        >
-          {submitting ? "Please wait..." : "Sign up"}
-        </button>
-
-        <div className="my-5 flex items-center gap-3 text-xs text-muted">
-          <span className="h-px flex-1 bg-border" />
-          OR
-          <span className="h-px flex-1 bg-border" />
-        </div>
-
-        <GoogleButton />
-
-        <p className="mt-4 text-center text-sm text-muted">
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            className="font-semibold text-accent hover:underline"
-          >
-            Login
-          </Link>
-        </p>
-      </form>
-    </div>
+      <p className="mt-6 text-center text-sm text-muted">
+        Already have an account?{" "}
+        <Link to="/login" className="font-semibold text-accent hover:underline">
+          Login
+        </Link>
+      </p>
+    </form>
   );
 }

@@ -1,64 +1,164 @@
 import { Link } from "react-router-dom";
-import { ShieldCheck, Truck, Headset } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { ShieldCheck, Truck, Headset, Banknote, ArrowUp } from "lucide-react";
+import api from "../api/axios";
+import { useAuth } from "../context/auth.js";
 import Logo from "./Logo.jsx";
 
 const year = new Date().getFullYear();
 
-const features = [
-  { icon: ShieldCheck, title: "Secure", text: "Protected checkout and accounts" },
-  { icon: Truck, title: "Fast Delivery", text: "Quick dispatch on every order" },
-  { icon: Headset, title: "24/7 Support", text: "We are here whenever you need us" },
+const perks = [
+  { icon: ShieldCheck, label: "Secure checkout" },
+  { icon: Truck, label: "Fast delivery" },
+  { icon: Banknote, label: "Cash on Delivery" },
+  { icon: Headset, label: "24/7 support" },
 ];
 
-const links = [
-  { to: "/", label: "Products" },
-  { to: "/cart", label: "Cart" },
-  { to: "/orders", label: "Orders" },
-];
+const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+const linkClass = "text-sm text-muted transition hover:text-accent";
 
 export default function Footer() {
+  const { user } = useAuth();
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const res = await api.get("/categories");
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   return (
     <footer className="mt-20">
       <div className="h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent" />
 
-      <div className="mx-auto max-w-6xl px-4 py-12">
-        <div className="grid gap-4 sm:grid-cols-3">
-          {features.map((feature) => {
-            const Icon = feature.icon;
+      <div className="mx-auto max-w-6xl px-4 pt-14">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="lg:col-span-2">
+            <Logo className="h-14" />
+
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
+              Your one-stop online store for electronics, fashion, home essentials
+              and more, delivered straight to your door.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">
+              Shop
+            </h4>
+            <ul className="space-y-3">
+              <li>
+                <Link to="/" onClick={scrollTop} className={linkClass}>
+                  All products
+                </Link>
+              </li>
+              {categories.slice(0, 5).map((category) => (
+                <li key={category.id}>
+                  <Link
+                    to={`/?category=${category.id}`}
+                    onClick={scrollTop}
+                    className={linkClass}
+                  >
+                    {category.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">
+              Account
+            </h4>
+            <ul className="space-y-3">
+              {user ? (
+                <>
+                  <li>
+                    <Link to="/profile" onClick={scrollTop} className={linkClass}>
+                      My profile
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/cart" onClick={scrollTop} className={linkClass}>
+                      My cart
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/orders" onClick={scrollTop} className={linkClass}>
+                      My orders
+                    </Link>
+                  </li>
+                  {user.role === "admin" && (
+                    <li>
+                      <Link to="/admin" onClick={scrollTop} className={linkClass}>
+                        Admin panel
+                      </Link>
+                    </li>
+                  )}
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link to="/login" onClick={scrollTop} className={linkClass}>
+                      Login
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/signup" onClick={scrollTop} className={linkClass}>
+                      Create account
+                    </Link>
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
+        </div>
+
+        <ul className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-white/10 py-6">
+          {perks.map((perk) => {
+            const Icon = perk.icon;
 
             return (
-              <div
-                key={feature.title}
-                className="glass card-glow flex items-center gap-4 rounded-2xl p-5"
+              <li
+                key={perk.label}
+                className="flex items-center gap-2 text-xs text-white/70"
               >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent">
-                  <Icon className="h-6 w-6" />
-                </span>
-                <div>
-                  <p className="font-semibold">{feature.title}</p>
-                  <p className="text-sm text-muted">{feature.text}</p>
-                </div>
-              </div>
+                <Icon size={15} className="text-accent" />
+                {perk.label}
+              </li>
             );
           })}
-        </div>
-
-        <div className="mt-12 flex flex-col items-center justify-between gap-6 md:flex-row">
-          <Logo className="h-14" />
-
-          <nav className="flex gap-6 text-sm text-muted">
-            {links.map((link) => (
-              <Link key={link.to} to={link.to} className="transition hover:text-accent">
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
+        </ul>
       </div>
 
-      <p className="border-t border-white/10 py-5 text-center text-xs text-muted">
-        © {year} Avenzo. All rights reserved.
-      </p>
+      <div className="border-t border-white/10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-5 text-xs text-muted sm:flex-row">
+          <p>© {year} Avenzo. All rights reserved.</p>
+
+          <p>
+            Designed & built by{" "}
+            <a
+              href="https://github.com/shayan-malik"
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-accent hover:underline"
+            >
+              Shayan Malik
+            </a>
+          </p>
+
+          <button
+            onClick={scrollTop}
+            className="glass flex items-center gap-2 rounded-full px-4 py-1.5 transition hover:border-accent/60 hover:text-accent"
+          >
+            Back to top
+            <ArrowUp size={14} />
+          </button>
+        </div>
+      </div>
     </footer>
   );
 }
