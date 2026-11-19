@@ -14,7 +14,7 @@ export default function Navbar() {
 
   const [open, setOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
-  const shopRef = useRef(null);
+  const shopTimer = useRef(null);
 
   const { data: cartCount = 0 } = useQuery({
     queryKey: ["cart", user?.id],
@@ -35,7 +35,21 @@ export default function Navbar() {
   });
 
   const closeMenu = () => setOpen(false);
-  const closeShop = () => setShopOpen(false);
+
+  const openShop = () => {
+    clearTimeout(shopTimer.current);
+    setShopOpen(true);
+  };
+
+  const closeShopSoon = () => {
+    clearTimeout(shopTimer.current);
+    shopTimer.current = setTimeout(() => setShopOpen(false), 120);
+  };
+
+  const closeShop = () => {
+    clearTimeout(shopTimer.current);
+    setShopOpen(false);
+  };
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -54,27 +68,14 @@ export default function Navbar() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // dropdown: bahar click ya Escape par band ho jaye
   useEffect(() => {
-    if (!shopOpen) return;
-
-    const onDown = (e) => {
-      if (shopRef.current && !shopRef.current.contains(e.target)) {
-        setShopOpen(false);
-      }
-    };
     const onKey = (e) => {
       if (e.key === "Escape") setShopOpen(false);
     };
 
-    document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
-
-    return () => {
-      document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [shopOpen]);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -117,11 +118,18 @@ export default function Navbar() {
 
           {/* Desktop links */}
           <div className="hidden items-center gap-1 md:flex">
-            <div className="relative" ref={shopRef}>
-              <button
-                type="button"
-                onClick={() => setShopOpen((v) => !v)}
-                aria-expanded={shopOpen}
+            <div
+              className="relative"
+              onMouseEnter={openShop}
+              onMouseLeave={closeShopSoon}
+              onFocus={openShop}
+              onBlur={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget)) closeShopSoon();
+              }}
+            >
+              <Link
+                to="/"
+                onClick={closeShop}
                 className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm transition ${
                   isShopActive
                     ? "bg-accent/15 font-semibold text-accent"
@@ -133,31 +141,42 @@ export default function Navbar() {
                   size={15}
                   className={`transition-transform ${shopOpen ? "rotate-180" : ""}`}
                 />
-              </button>
+              </Link>
 
               {shopOpen && (
-                <div className="absolute left-0 top-full z-50 mt-2 w-56 rounded-2xl border border-white/10 bg-neutral-950/95 p-2 shadow-2xl backdrop-blur-xl">
-                  <Link to="/" onClick={closeShop} className={dropdownItem}>
-                    All products
-                  </Link>
-
-                  {categories.length > 0 && (
-                    <div className="my-1 h-px bg-white/10" />
-                  )}
-
-                  {categories.map((category) => (
-                    <Link
-                      key={category.id}
-                      to={`/?category=${category.id}`}
-                      onClick={closeShop}
-                      className={dropdownItem}
-                    >
-                      {category.name}
+                <div className="absolute left-0 top-full z-50 w-56 pt-2">
+                  <div className="rounded-2xl border border-white/10 bg-neutral-950 p-2 shadow-2xl">
+                    <Link to="/" onClick={closeShop} className={dropdownItem}>
+                      All products
                     </Link>
-                  ))}
+
+                    {categories.length > 0 && <div className="my-1 h-px bg-white/10" />}
+
+                    {categories.map((category) => (
+                      <Link
+                        key={category.id}
+                        to={`/?category=${category.id}`}
+                        onClick={closeShop}
+                        className={dropdownItem}
+                      >
+                        {category.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
+
+            {/* Bade screen par kuch categories seedhe navbar mein */}
+            {categories.slice(0, 3).map((category) => (
+              <Link
+                key={category.id}
+                to={`/?category=${category.id}`}
+                className="hidden rounded-full px-4 py-1.5 text-sm text-white/80 transition hover:bg-white/10 hover:text-white xl:inline-block"
+              >
+                {category.name}
+              </Link>
+            ))}
 
             {user && (
               <NavLink to="/orders" className={linkClass}>
