@@ -21,19 +21,29 @@ const trustChips = [
 ];
 
 export default function Products() {
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const category = searchParams.get("category") || "";
+  const urlSearch = searchParams.get("search") || "";
+
+  const [searchInput, setSearchInput] = useState(urlSearch);
+  const [search, setSearch] = useState(urlSearch.trim());
   const [sort, setSort] = useState("newest");
   const [page, setPage] = useState(1);
 
   const [prevCategory, setPrevCategory] = useState(category);
+  const [prevUrlSearch, setPrevUrlSearch] = useState(urlSearch);
 
-if (category !== prevCategory) {
+  if (category !== prevCategory) {
     setPrevCategory(category);
     setPage(1);
-}
+  }
+
+  if (urlSearch !== prevUrlSearch) {
+    setPrevUrlSearch(urlSearch);
+    setSearchInput(urlSearch);
+    setSearch(urlSearch.trim());
+    setPage(1);
+  }
 
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
@@ -82,7 +92,7 @@ if (category !== prevCategory) {
   const selectCategory = (id) => {
     setSearchParams(id ? { category: id } : {});
     setPage(1);
-};
+  };
 
   const scrollToCatalog = () => {
     document.getElementById("catalog")?.scrollIntoView({ behavior: "smooth" });
@@ -146,7 +156,7 @@ if (category !== prevCategory) {
         </section>
       )}
 
-      <div id="catalog" className="scroll-mt-24">
+      <div id="catalog" className="scroll-mt-32">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-2">
           <h2 className="text-3xl font-extrabold">
             <span className="text-gradient">Products</span>

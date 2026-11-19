@@ -1,20 +1,61 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingCart, ChevronDown } from "lucide-react";
+import { Link, NavLink, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Menu,
+  X,
+  ShoppingCart,
+  Search,
+  ChevronDown,
+  User,
+  ClipboardList,
+  LayoutDashboard,
+  LogOut,
+} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import { useAuth } from "../context/auth.js";
 import Logo from "./Logo.jsx";
 
+function SearchBar({ query, setQuery, onSubmit }) {
+  return (
+    <form
+      onSubmit={onSubmit}
+      role="search"
+      className="flex items-center rounded-full border border-white/10 bg-white/5 transition focus-within:border-accent/60 focus-within:bg-white/[0.07]"
+    >
+      <Search size={18} className="ml-4 shrink-0 text-muted" />
+
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search products..."
+        aria-label="Search products"
+        className="w-full min-w-0 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+      />
+
+      <button
+        type="submit"
+        className="btn-gold mr-1 hidden rounded-full px-5 py-1.5 text-sm sm:block"
+      >
+        Search
+      </button>
+    </form>
+  );
+}
+
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   const [open, setOpen] = useState(false);
-  const [shopOpen, setShopOpen] = useState(false);
-  const shopTimer = useRef(null);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [query, setQuery] = useState(searchParams.get("search") || "");
+
+  const accountRef = useRef(null);
+  const accountTimer = useRef(null);
 
   const { data: cartCount = 0 } = useQuery({
     queryKey: ["cart", user?.id],
@@ -25,30 +66,21 @@ export default function Navbar() {
     enabled: !!user,
   });
 
-  const { data: categories = [] } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const res = await api.get("/categories");
-      return res.data;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-
   const closeMenu = () => setOpen(false);
 
-  const openShop = () => {
-    clearTimeout(shopTimer.current);
-    setShopOpen(true);
+  const openAccount = () => {
+    clearTimeout(accountTimer.current);
+    setAccountOpen(true);
   };
 
-  const closeShopSoon = () => {
-    clearTimeout(shopTimer.current);
-    shopTimer.current = setTimeout(() => setShopOpen(false), 120);
+  const closeAccountSoon = () => {
+    clearTimeout(accountTimer.current);
+    accountTimer.current = setTimeout(() => setAccountOpen(false), 150);
   };
 
-  const closeShop = () => {
-    clearTimeout(shopTimer.current);
-    setShopOpen(false);
+  const closeAccount = () => {
+    clearTimeout(accountTimer.current);
+    setAccountOpen(false);
   };
 
   useEffect(() => {
@@ -69,31 +101,44 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    if (!accountOpen) return;
+
+    const onDown = (e) => {
+      if (accountRef.current && !accountRef.current.contains(e.target)) {
+        setAccountOpen(false);
+      }
+    };
     const onKey = (e) => {
-      if (e.key === "Escape") setShopOpen(false);
+      if (e.key === "Escape") setAccountOpen(false);
     };
 
+    document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, []);
+
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [accountOpen]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const q = query.trim();
+    navigate(q ? `/?search=${encodeURIComponent(q)}` : "/");
+    closeMenu();
+  };
 
   const handleLogout = async () => {
     try {
       await logout();
       closeMenu();
+      closeAccount();
       toast.success("Logged out successfully");
       navigate("/login");
     } catch {
       toast.error("Failed to log out");
     }
   };
-
-  const linkClass = ({ isActive }) =>
-    `rounded-full px-4 py-1.5 text-sm transition ${
-      isActive
-        ? "bg-accent/15 font-semibold text-accent"
-        : "text-white/80 hover:bg-white/10 hover:text-white"
-    }`;
 
   const mobileLinkClass = ({ isActive }) =>
     `flex items-center justify-between rounded-xl px-4 py-3 text-base ${
@@ -102,155 +147,140 @@ export default function Navbar() {
         : "text-white hover:bg-white/5"
     }`;
 
-  const dropdownItem =
-    "block rounded-xl px-4 py-2.5 text-sm text-white/80 transition hover:bg-white/10 hover:text-accent";
+  const menuItem =
+    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/80 transition hover:bg-white/10 hover:text-accent";
 
-  const isShopActive = location.pathname === "/";
   const initial = user?.first_name?.[0]?.toUpperCase() || "U";
+  const fullName = user
+    ? `${user.first_name} ${user.last_name || ""}`.trim()
+    : "";
 
   return (
     <header className="sticky top-0 z-40">
       <div className="glass-nav">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link to="/">
-            <Logo className="h-10 sm:h-12" />
-          </Link>
+        <nav className="mx-auto max-w-6xl px-4">
+          <div className="flex items-center gap-3 py-3 md:gap-6">
+            <Link to="/" className="shrink-0">
+              <Logo className="h-10 sm:h-12" />
+            </Link>
 
-          {/* Desktop links */}
-          <div className="hidden items-center gap-1 md:flex">
-            <div
-              className="relative"
-              onMouseEnter={openShop}
-              onMouseLeave={closeShopSoon}
-              onFocus={openShop}
-              onBlur={(e) => {
-                if (!e.currentTarget.contains(e.relatedTarget)) closeShopSoon();
-              }}
-            >
-              <Link
-                to="/"
-                onClick={closeShop}
-                className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm transition ${
-                  isShopActive
-                    ? "bg-accent/15 font-semibold text-accent"
-                    : "text-white/80 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                Shop
-                <ChevronDown
-                  size={15}
-                  className={`transition-transform ${shopOpen ? "rotate-180" : ""}`}
-                />
-              </Link>
-
-              {shopOpen && (
-                <div className="absolute left-0 top-full z-50 w-56 pt-2">
-                  <div className="rounded-2xl border border-white/10 bg-neutral-950 p-2 shadow-2xl">
-                    <Link to="/" onClick={closeShop} className={dropdownItem}>
-                      All products
-                    </Link>
-
-                    {categories.length > 0 && <div className="my-1 h-px bg-white/10" />}
-
-                    {categories.map((category) => (
-                      <Link
-                        key={category.id}
-                        to={`/?category=${category.id}`}
-                        onClick={closeShop}
-                        className={dropdownItem}
-                      >
-                        {category.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
+            {/* Desktop search */}
+            <div className="hidden min-w-0 max-w-xl flex-1 md:block">
+              <SearchBar query={query} setQuery={setQuery} onSubmit={handleSearch} />
             </div>
 
-            {/* Bade screen par kuch categories seedhe navbar mein */}
-            {categories.slice(0, 3).map((category) => (
-              <Link
-                key={category.id}
-                to={`/?category=${category.id}`}
-                className="hidden rounded-full px-4 py-1.5 text-sm text-white/80 transition hover:bg-white/10 hover:text-white xl:inline-block"
-              >
-                {category.name}
-              </Link>
-            ))}
-
-            {user && (
-              <NavLink to="/orders" className={linkClass}>
-                Orders
-              </NavLink>
-            )}
-
-            {user?.role === "admin" && (
-              <NavLink to="/admin" className={linkClass}>
-                Admin
-              </NavLink>
-            )}
-          </div>
-
-          <div className="hidden items-center gap-3 md:flex">
-            {user && (
-              <NavLink
-                to="/cart"
-                aria-label="Cart"
-                className="glass relative flex h-10 w-10 items-center justify-center rounded-full text-white transition hover:border-accent/60 hover:text-accent"
-              >
-                <ShoppingCart size={18} />
-                {cartCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-xs font-bold text-black">
-                    {cartCount}
-                  </span>
-                )}
-              </NavLink>
-            )}
-
-            {!loading &&
-              (user ? (
-                <>
-                  <NavLink
-                    to="/profile"
-                    className="glass flex items-center gap-2 rounded-full py-1 pl-1 pr-4 text-sm text-white transition hover:border-accent/60"
-                  >
-                    <span className="btn-gold flex h-8 w-8 items-center justify-center rounded-full text-sm">
-                      {initial}
+            <div className="ml-auto flex items-center gap-2 md:gap-3">
+              {user && (
+                <NavLink
+                  to="/cart"
+                  aria-label="Cart"
+                  className="glass relative flex h-10 w-10 items-center justify-center rounded-full text-white transition hover:border-accent/60 hover:text-accent"
+                >
+                  <ShoppingCart size={18} />
+                  {cartCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-xs font-bold text-black">
+                      {cartCount}
                     </span>
-                    {user.first_name}
-                  </NavLink>
+                  )}
+                </NavLink>
+              )}
 
-                  <button
-                    onClick={handleLogout}
-                    className="rounded-full border border-white/15 px-4 py-1.5 text-sm font-semibold text-white/80 transition hover:border-accent hover:text-accent"
+              {/* Desktop account */}
+              {!loading &&
+                (user ? (
+                  <div
+                    ref={accountRef}
+                    className="relative hidden md:block"
+                    onMouseEnter={openAccount}
+                    onMouseLeave={closeAccountSoon}
                   >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <NavLink to="/login" className={linkClass}>
-                    Login
-                  </NavLink>
-                  <Link
-                    to="/signup"
-                    className="btn-gold rounded-full px-5 py-2 text-sm"
-                  >
-                    Signup
-                  </Link>
-                </>
-              ))}
+                    <button
+                      type="button"
+                      onClick={openAccount}
+                      aria-haspopup="menu"
+                      aria-expanded={accountOpen}
+                      className="glass flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm text-white transition hover:border-accent/60"
+                    >
+                      <span className="btn-gold flex h-8 w-8 items-center justify-center rounded-full text-sm">
+                        {initial}
+                      </span>
+                      <span className="max-w-24 truncate">{user.first_name}</span>
+                      <ChevronDown
+                        size={15}
+                        className={`transition-transform ${
+                          accountOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {accountOpen && (
+                      <div className="absolute right-0 top-full z-50 w-60 pt-2">
+                        <div className="rounded-2xl border border-white/10 bg-neutral-950 p-2 shadow-2xl">
+                          <div className="border-b border-white/10 px-3 pb-3 pt-2">
+                            <p className="truncate text-sm font-semibold">{fullName}</p>
+                            <p className="truncate text-xs text-muted">{user.email}</p>
+                          </div>
+
+                          <div className="pt-2">
+                            <Link to="/profile" onClick={closeAccount} className={menuItem}>
+                              <User size={16} />
+                              My profile
+                            </Link>
+                            <Link to="/orders" onClick={closeAccount} className={menuItem}>
+                              <ClipboardList size={16} />
+                              My orders
+                            </Link>
+                            {user.role === "admin" && (
+                              <Link to="/admin" onClick={closeAccount} className={menuItem}>
+                                <LayoutDashboard size={16} />
+                                Admin panel
+                              </Link>
+                            )}
+
+                            <div className="my-1 h-px bg-white/10" />
+
+                            <button
+                              onClick={handleLogout}
+                              className={`${menuItem} w-full hover:!text-red-400`}
+                            >
+                              <LogOut size={16} />
+                              Logout
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="hidden items-center gap-2 md:flex">
+                    <Link
+                      to="/login"
+                      className="rounded-full px-4 py-1.5 text-sm text-white/80 transition hover:bg-white/10 hover:text-white"
+                    >
+                      Login
+                    </Link>
+                    <Link to="/signup" className="btn-gold rounded-full px-5 py-2 text-sm">
+                      Signup
+                    </Link>
+                  </div>
+                ))}
+
+              {/* Mobile hamburger */}
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
+                aria-label="Open menu"
+                className="glass rounded-xl p-2.5 text-white hover:text-accent md:hidden"
+              >
+                <Menu size={20} />
+              </button>
+            </div>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            aria-label="Open menu"
-            className="glass rounded-xl p-2 text-white hover:text-accent md:hidden"
-          >
-            <Menu size={22} />
-          </button>
+          {/* Mobile search */}
+          <div className="pb-3 md:hidden">
+            <SearchBar query={query} setQuery={setQuery} onSubmit={handleSearch} />
+          </div>
         </nav>
       </div>
 
@@ -277,21 +307,6 @@ export default function Navbar() {
               <NavLink to="/" end className={mobileLinkClass} onClick={closeMenu}>
                 Products
               </NavLink>
-
-              {categories.length > 0 && (
-                <div className="flex flex-wrap gap-2 px-4 pb-2 pt-1">
-                  {categories.map((category) => (
-                    <Link
-                      key={category.id}
-                      to={`/?category=${category.id}`}
-                      onClick={closeMenu}
-                      className="glass rounded-full px-3 py-1.5 text-xs text-white/80 hover:text-accent"
-                    >
-                      {category.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
 
               {user && (
                 <NavLink to="/cart" className={mobileLinkClass} onClick={closeMenu}>
