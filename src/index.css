@@ -147,3 +147,25 @@ select:-webkit-autofill {
 input:-webkit-autofill:focus {
   border-color: rgba(255, 184, 0, 0.6);
 }
+
+
+/* Buttons par pointer cursor (Tailwind v4 ka default arrow hota hai) */
+button:not(:disabled),
+[role="button"],
+select,
+summary,
+input[type="file"],
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Mobile par side scroll roko (clip use kiya hai taake sticky navbar chalta rahe) */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}

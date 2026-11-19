@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingCart } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, ShoppingCart, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import api from "../api/axios";
@@ -10,7 +10,11 @@ import Logo from "./Logo.jsx";
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [open, setOpen] = useState(false);
+  const [shopOpen, setShopOpen] = useState(false);
+  const shopRef = useRef(null);
 
   const { data: cartCount = 0 } = useQuery({
     queryKey: ["cart", user?.id],
@@ -21,7 +25,17 @@ export default function Navbar() {
     enabled: !!user,
   });
 
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const res = await api.get("/categories");
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   const closeMenu = () => setOpen(false);
+  const closeShop = () => setShopOpen(false);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -39,6 +53,28 @@ export default function Navbar() {
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
+
+  // dropdown: bahar click ya Escape par band ho jaye
+  useEffect(() => {
+    if (!shopOpen) return;
+
+    const onDown = (e) => {
+      if (shopRef.current && !shopRef.current.contains(e.target)) {
+        setShopOpen(false);
+      }
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape") setShopOpen(false);
+    };
+
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [shopOpen]);
 
   const handleLogout = async () => {
     try {
@@ -65,6 +101,10 @@ export default function Navbar() {
         : "text-white hover:bg-white/5"
     }`;
 
+  const dropdownItem =
+    "block rounded-xl px-4 py-2.5 text-sm text-white/80 transition hover:bg-white/10 hover:text-accent";
+
+  const isShopActive = location.pathname === "/";
   const initial = user?.first_name?.[0]?.toUpperCase() || "U";
 
   return (
@@ -75,11 +115,49 @@ export default function Navbar() {
             <Logo className="h-10 sm:h-12" />
           </Link>
 
-          {/* Desktop */}
+          {/* Desktop links */}
           <div className="hidden items-center gap-1 md:flex">
-            <NavLink to="/" end className={linkClass}>
-              Products
-            </NavLink>
+            <div className="relative" ref={shopRef}>
+              <button
+                type="button"
+                onClick={() => setShopOpen((v) => !v)}
+                aria-expanded={shopOpen}
+                className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm transition ${
+                  isShopActive
+                    ? "bg-accent/15 font-semibold text-accent"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                Shop
+                <ChevronDown
+                  size={15}
+                  className={`transition-transform ${shopOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {shopOpen && (
+                <div className="absolute left-0 top-full z-50 mt-2 w-56 rounded-2xl border border-white/10 bg-neutral-950/95 p-2 shadow-2xl backdrop-blur-xl">
+                  <Link to="/" onClick={closeShop} className={dropdownItem}>
+                    All products
+                  </Link>
+
+                  {categories.length > 0 && (
+                    <div className="my-1 h-px bg-white/10" />
+                  )}
+
+                  {categories.map((category) => (
+                    <Link
+                      key={category.id}
+                      to={`/?category=${category.id}`}
+                      onClick={closeShop}
+                      className={dropdownItem}
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {user && (
               <NavLink to="/orders" className={linkClass}>
@@ -180,6 +258,21 @@ export default function Navbar() {
               <NavLink to="/" end className={mobileLinkClass} onClick={closeMenu}>
                 Products
               </NavLink>
+
+              {categories.length > 0 && (
+                <div className="flex flex-wrap gap-2 px-4 pb-2 pt-1">
+                  {categories.map((category) => (
+                    <Link
+                      key={category.id}
+                      to={`/?category=${category.id}`}
+                      onClick={closeMenu}
+                      className="glass rounded-full px-3 py-1.5 text-xs text-white/80 hover:text-accent"
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
 
               {user && (
                 <NavLink to="/cart" className={mobileLinkClass} onClick={closeMenu}>
