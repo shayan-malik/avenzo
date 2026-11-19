@@ -171,3 +171,8 @@ body {
 .grid > * {
   min-width: 0;
 }
+
+/* Site ki width 1152px se 1280px */
+.max-w-6xl {
+  max-width: 80rem;
+}

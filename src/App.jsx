@@ -14,10 +14,13 @@ import AdminCategories from "./pages/admin/AdminCategories.jsx";
 import AdminProducts from "./pages/admin/AdminProducts.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import Profile from "./pages/Profile.jsx";
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       {/* login/signup: bina navbar aur footer ke */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
@@ -71,6 +74,7 @@ export default function App() {
 
         <Route path="*" element={<NotFound />} />
       </Route>
-    </Routes>
+      </Routes>
+    </>
   );
 }

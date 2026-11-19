@@ -159,17 +159,24 @@ export default function Navbar() {
     <header className="sticky top-0 z-40">
       <div className="glass-nav">
         <nav className="mx-auto max-w-6xl px-4">
-          <div className="flex items-center gap-3 py-3 md:gap-6">
+          <div className="flex items-center justify-between gap-3 py-3 md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-6 lg:grid-cols-[1fr_minmax(0,34rem)_1fr]">
             <Link to="/" className="shrink-0">
               <Logo className="h-10 sm:h-12" />
             </Link>
 
             {/* Desktop search */}
-            <div className="hidden min-w-0 max-w-xl flex-1 md:block">
-              <SearchBar query={query} setQuery={setQuery} onSubmit={handleSearch} />
+            <div className="hidden min-w-0 md:block">
+              <div className="mx-auto w-full md:max-w-md lg:max-w-none">
+                <SearchBar
+                  query={query}
+                  setQuery={setQuery}
+                  onSubmit={handleSearch}
+                />
+              </div>
             </div>
 
-            <div className="ml-auto flex items-center gap-2 md:gap-3">
+            <div className="ml-auto flex items-center gap-2 md:gap-3 md:justify-self-end">
+              <div className="ml-auto flex items-center gap-2 md:gap-3 md:justify-self-end"></div>
               {user && (
                 <NavLink
                   to="/cart"
@@ -204,7 +211,9 @@ export default function Navbar() {
                       <span className="btn-gold flex h-8 w-8 items-center justify-center rounded-full text-sm">
                         {initial}
                       </span>
-                      <span className="max-w-24 truncate">{user.first_name}</span>
+                      <span className="max-w-24 truncate">
+                        {user.first_name}
+                      </span>
                       <ChevronDown
                         size={15}
                         className={`transition-transform ${
@@ -217,21 +226,37 @@ export default function Navbar() {
                       <div className="absolute right-0 top-full z-50 w-60 pt-2">
                         <div className="rounded-2xl border border-white/10 bg-neutral-950 p-2 shadow-2xl">
                           <div className="border-b border-white/10 px-3 pb-3 pt-2">
-                            <p className="truncate text-sm font-semibold">{fullName}</p>
-                            <p className="truncate text-xs text-muted">{user.email}</p>
+                            <p className="truncate text-sm font-semibold">
+                              {fullName}
+                            </p>
+                            <p className="truncate text-xs text-muted">
+                              {user.email}
+                            </p>
                           </div>
 
                           <div className="pt-2">
-                            <Link to="/profile" onClick={closeAccount} className={menuItem}>
+                            <Link
+                              to="/profile"
+                              onClick={closeAccount}
+                              className={menuItem}
+                            >
                               <User size={16} />
                               My profile
                             </Link>
-                            <Link to="/orders" onClick={closeAccount} className={menuItem}>
+                            <Link
+                              to="/orders"
+                              onClick={closeAccount}
+                              className={menuItem}
+                            >
                               <ClipboardList size={16} />
                               My orders
                             </Link>
                             {user.role === "admin" && (
-                              <Link to="/admin" onClick={closeAccount} className={menuItem}>
+                              <Link
+                                to="/admin"
+                                onClick={closeAccount}
+                                className={menuItem}
+                              >
                                 <LayoutDashboard size={16} />
                                 Admin panel
                               </Link>
@@ -259,7 +284,10 @@ export default function Navbar() {
                     >
                       Login
                     </Link>
-                    <Link to="/signup" className="btn-gold rounded-full px-5 py-2 text-sm">
+                    <Link
+                      to="/signup"
+                      className="btn-gold rounded-full px-5 py-2 text-sm"
+                    >
                       Signup
                     </Link>
                   </div>
@@ -275,11 +303,6 @@ export default function Navbar() {
                 <Menu size={20} />
               </button>
             </div>
-          </div>
-
-          {/* Mobile search */}
-          <div className="pb-3 md:hidden">
-            <SearchBar query={query} setQuery={setQuery} onSubmit={handleSearch} />
           </div>
         </nav>
       </div>
@@ -304,35 +327,41 @@ export default function Navbar() {
 
           <div className="flex flex-1 flex-col overflow-y-auto px-4 pb-8 pt-4">
             <div className="space-y-1">
-              <NavLink to="/" end className={mobileLinkClass} onClick={closeMenu}>
+              <NavLink
+                to="/"
+                end
+                className={mobileLinkClass}
+                onClick={closeMenu}
+              >
                 Products
               </NavLink>
 
               {user && (
-                <NavLink to="/cart" className={mobileLinkClass} onClick={closeMenu}>
-                  <span>Cart</span>
-                  {cartCount > 0 && (
-                    <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-black">
-                      {cartCount}
-                    </span>
-                  )}
-                </NavLink>
-              )}
-
-              {user && (
-                <NavLink to="/orders" className={mobileLinkClass} onClick={closeMenu}>
+                <NavLink
+                  to="/orders"
+                  className={mobileLinkClass}
+                  onClick={closeMenu}
+                >
                   Orders
                 </NavLink>
               )}
 
               {user?.role === "admin" && (
-                <NavLink to="/admin" className={mobileLinkClass} onClick={closeMenu}>
+                <NavLink
+                  to="/admin"
+                  className={mobileLinkClass}
+                  onClick={closeMenu}
+                >
                   Admin
                 </NavLink>
               )}
 
               {user && (
-                <NavLink to="/profile" className={mobileLinkClass} onClick={closeMenu}>
+                <NavLink
+                  to="/profile"
+                  className={mobileLinkClass}
+                  onClick={closeMenu}
+                >
                   Profile ({user.first_name})
                 </NavLink>
               )}
